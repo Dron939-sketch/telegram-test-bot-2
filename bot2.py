@@ -17,25 +17,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# ⚠️ ТОКЕН ИЗ ПЕРЕМЕННЫХ ОКРУЖЕНИЯ
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-
 if not TOKEN:
     raise ValueError("❌ ОШИБКА: Переменная TELEGRAM_BOT_TOKEN не установлена!")
 
 # ========== СОСТОЯНИЯ ==========
-STAGE_1_BLOCK_1 = 1  # Детские раны
-STAGE_1_BLOCK_2 = 2  # Базовый страх
-STAGE_1_BLOCK_3 = 3  # Стратегия выживания
-STAGE_1_BLOCK_4 = 4  # Отношения
-STAGE_1_BLOCK_5 = 5  # Деньги и свобода
-STAGE_1_BLOCK_6 = 6  # Миссия
-STAGE_2 = 7          # Этап 2: Определение уровня
+STAGE_1_BLOCK_1 = 1
+STAGE_1_BLOCK_2 = 2
+STAGE_1_BLOCK_3 = 3
+STAGE_1_BLOCK_4 = 4
+STAGE_1_BLOCK_5 = 5
+STAGE_1_BLOCK_6 = 6
+STAGE_2 = 7
 
 # ========== ЭТАП 1: ВОПРОСЫ ПО БЛОКАМ (24 вопроса) ==========
-
 STAGE_1_QUESTIONS = {
-    # ========== БЛОК 1: ДЕТСКИЕ РАНЫ (4 вопроса) ==========
     "block_1": {
         "title": "🔥 БЛОК 1: ДЕТСКИЕ РАНЫ",
         "description": "Эти вопросы помогут понять, какая травма сформировала твою базовую программу.",
@@ -78,8 +74,6 @@ STAGE_1_QUESTIONS = {
             }
         ]
     },
-    
-    # ========== БЛОК 2: БАЗОВЫЙ СТРАХ (4 вопроса) ==========
     "block_2": {
         "title": "😨 БЛОК 2: БАЗОВЫЙ СТРАХ",
         "description": "Какой страх управляет твоей жизнью?",
@@ -107,7 +101,7 @@ STAGE_1_QUESTIONS = {
                 "options": {
                     "СБ": "От конфликтов, от тех, кто сильнее",
                     "ТФ": "От боли, от болезней, от врачей",
-                    "УБ": "От сложных задач, от экзаменов, от ситуаций, где нужно думать",
+                    "УБ": "От сложных задач, от экзаменов",
                     "ЧВ": "От отношений, от близости, от любви"
                 }
             },
@@ -122,8 +116,6 @@ STAGE_1_QUESTIONS = {
             }
         ]
     },
-    
-    # ========== БЛОК 3: СТРАТЕГИЯ ВЫЖИВАНИЯ (4 вопроса) ==========
     "block_3": {
         "title": "🛡️ БЛОК 3: СТРАТЕГИЯ ВЫЖИВАНИЯ",
         "description": "Как ты защищаешься от страха?",
@@ -133,8 +125,8 @@ STAGE_1_QUESTIONS = {
                 "options": {
                     "СБ": "Терплю, молчу или дерусь",
                     "ТФ": "Ухожу в болезнь, игнорирую тело",
-                    "УБ": "Делаю вид, что всё понимаю, или избегаю ситуаций",
-                    "ЧВ": "Ищу любовь, цепляюсь за отношения или избегаю их"
+                    "УБ": "Делаю вид, что всё понимаю",
+                    "ЧВ": "Ищу любовь, цепляюсь за отношения"
                 }
             },
             {
@@ -161,13 +153,11 @@ STAGE_1_QUESTIONS = {
                     "СБ": "«Надо терпеть» или «Надо драться»",
                     "ТФ": "«Надо выжить» или «Надо вылечиться»",
                     "УБ": "«Надо понять» или «Надо научиться»",
-                    "ЧВ": "«Надо найти любовь» или «Надо полюбить себя»"
+                    "ЧВ": "«Надо найти любовь»"
                 }
             }
         ]
     },
-    
-    # ========== БЛОК 4: ОТНОШЕНИЯ (4 вопроса) ==========
     "block_4": {
         "title": "💔 БЛОК 4: ОТНОШЕНИЯ",
         "description": "Как ты строишь отношения с людьми?",
@@ -176,7 +166,7 @@ STAGE_1_QUESTIONS = {
                 "text": "Какие отношения у тебя чаще всего?",
                 "options": {
                     "СБ": "Я подчиняюсь или доминирую",
-                    "ТФ": "Я болею, меня жалеют или я забочусь о других",
+                    "ТФ": "Я болею, меня жалеют",
                     "УБ": "Я учу или учусь",
                     "ЧВ": "Я люблю или меня любят"
                 }
@@ -184,34 +174,32 @@ STAGE_1_QUESTIONS = {
             {
                 "text": "Почему у тебя не складываются отношения?",
                 "options": {
-                    "СБ": "Я боюсь, что меня подавят, или я сам подавляю",
-                    "ТФ": "Я болею, меня не хотят, или я не хочу больных",
-                    "УБ": "Я слишком умный или слишком глупый",
-                    "ЧВ": "Я боюсь, что меня бросят, или я сам бросаю"
+                    "СБ": "Я боюсь, что меня подавят",
+                    "ТФ": "Я болею, меня не хотят",
+                    "УБ": "Я слишком умный или глупый",
+                    "ЧВ": "Я боюсь, что меня бросят"
                 }
             },
             {
                 "text": "Что ты ждёшь от партнёра?",
                 "options": {
-                    "СБ": "Чтобы он защитил меня или подчинился",
+                    "СБ": "Чтобы он защитил меня",
                     "ТФ": "Чтобы он позаботился о моём теле",
-                    "УБ": "Чтобы он был умным или восхищался моим умом",
+                    "УБ": "Чтобы он был умным",
                     "ЧВ": "Чтобы он любил меня безусловно"
                 }
             },
             {
                 "text": "Почему ты расстаёшься?",
                 "options": {
-                    "СБ": "Он подавляет меня или я подавляю его",
-                    "ТФ": "Он не заботится о моём теле или я устал заботиться",
-                    "УБ": "Он не понимает меня или я не понимаю его",
-                    "ЧВ": "Он разлюбил меня или я разлюбил его"
+                    "СБ": "Он подавляет меня",
+                    "ТФ": "Он не заботится о моём теле",
+                    "УБ": "Он не понимает меня",
+                    "ЧВ": "Он разлюбил меня"
                 }
             }
         ]
     },
-    
-    # ========== БЛОК 5: ДЕНЬГИ И СВОБОДА (4 вопроса) ==========
     "block_5": {
         "title": "💰 БЛОК 5: ДЕНЬГИ И СВОБОДА",
         "description": "Как ты зарабатываешь и тратишь деньги?",
@@ -220,27 +208,27 @@ STAGE_1_QUESTIONS = {
                 "text": "Как ты зарабатываешь деньги?",
                 "options": {
                     "СБ": "Я терплю или дерусь за деньги",
-                    "ТФ": "Я продаю своё тело (физический труд, внешность)",
-                    "УБ": "Я продаю свои знания (консультации, обучение)",
-                    "ЧВ": "Я продаю свои чувства (забота, любовь, эмпатия)"
+                    "ТФ": "Я продаю своё тело",
+                    "УБ": "Я продаю свои знания",
+                    "ЧВ": "Я продаю свои чувства"
                 }
             },
             {
                 "text": "На что ты тратишь деньги?",
                 "options": {
-                    "СБ": "На защиту (охрана, страховка, адвокаты)",
-                    "ТФ": "На здоровье (врачи, спорт, еда)",
-                    "УБ": "На обучение (курсы, книги, тренинги)",
-                    "ЧВ": "На отношения (подарки, свидания, путешествия)"
+                    "СБ": "На защиту",
+                    "ТФ": "На здоровье",
+                    "УБ": "На обучение",
+                    "ЧВ": "На отношения"
                 }
             },
             {
                 "text": "Почему у тебя нет денег?",
                 "options": {
-                    "СБ": "Меня используют или я боюсь просить больше",
-                    "ТФ": "Я болею или трачу всё на лечение",
-                    "УБ": "Я не умею зарабатывать или боюсь продавать",
-                    "ЧВ": "Я трачу всё на других или боюсь быть богатым"
+                    "СБ": "Меня используют",
+                    "ТФ": "Я болею",
+                    "УБ": "Я не умею зарабатывать",
+                    "ЧВ": "Я трачу всё на других"
                 }
             },
             {
@@ -254,8 +242,6 @@ STAGE_1_QUESTIONS = {
             }
         ]
     },
-    
-    # ========== БЛОК 6: МИССИЯ (4 вопроса) ==========
     "block_6": {
         "title": "🎯 БЛОК 6: МИССИЯ",
         "description": "Зачем ты живёшь?",
@@ -264,7 +250,7 @@ STAGE_1_QUESTIONS = {
                 "text": "В чём смысл твоей жизни?",
                 "options": {
                     "СБ": "Стать сильным, защитить слабых",
-                    "ТФ": "Быть здоровым, помочь другим быть здоровыми",
+                    "ТФ": "Быть здоровым, помочь другим",
                     "УБ": "Понять мир, научить других",
                     "ЧВ": "Любить и быть любимым"
                 }
@@ -272,19 +258,19 @@ STAGE_1_QUESTIONS = {
             {
                 "text": "Что ты хочешь оставить после себя?",
                 "options": {
-                    "СБ": "Систему справедливости, защиту слабых",
-                    "ТФ": "Здоровое поколение, новую парадигму здоровья",
-                    "УБ": "Знания, новую парадигму познания",
-                    "ЧВ": "Любовь, новую парадигму отношений"
+                    "СБ": "Систему справедливости",
+                    "ТФ": "Здоровое поколение",
+                    "УБ": "Знания",
+                    "ЧВ": "Любовь"
                 }
             },
             {
                 "text": "Кем ты хочешь стать?",
                 "options": {
-                    "СБ": "Воином, судьёй, законодателем",
-                    "ТФ": "Целителем, мастером тела, создателем системы здоровья",
-                    "УБ": "Учителем, мастером познания, создателем парадигмы",
-                    "ЧВ": "Любящим, целителем сердец, создателем пространства любви"
+                    "СБ": "Воином, судьёй",
+                    "ТФ": "Целителем",
+                    "УБ": "Учителем",
+                    "ЧВ": "Любящим"
                 }
             },
             {
@@ -301,19 +287,17 @@ STAGE_1_QUESTIONS = {
 }
 
 # ========== ЭТАП 2: ВОПРОСЫ ПО УРОВНЯМ ДИЛТСА (12 вопросов) ==========
-
 STAGE_2_QUESTIONS = [
-    # ========== УРОВЕНЬ 1: ОКРУЖЕНИЕ (2 вопроса) ==========
     {
         "level": "🌍 УРОВЕНЬ 1: ОКРУЖЕНИЕ",
         "text": "Где ты живёшь?",
         "options": {
-            "6": "В аду. Меня окружают враги/болезни/дураки/нелюбящие",
-            "7": "В зоне боевых действий. Я постоянно дерусь",
-            "8": "В джунглях. Я манипулирую, чтобы выжить",
+            "6": "В аду. Меня окружают враги",
+            "7": "В зоне боевых действий",
+            "8": "В джунглях. Я манипулирую",
             "9": "В системе. Я работаю по правилам",
             "10": "В команде. Я веду людей",
-            "J": "На поле боя/в клинике/в школе. Я выполняю роль",
+            "J": "На поле боя. Я выполняю роль",
             "Q": "В мастерской. Я учу других",
             "K": "В своём мире. Я создаю правила",
             "A": "Везде и нигде. Я свободен"
@@ -323,29 +307,27 @@ STAGE_2_QUESTIONS = [
         "level": "🌍 УРОВЕНЬ 1: ОКРУЖЕНИЕ",
         "text": "Кто тебя окружает?",
         "options": {
-            "6": "Враги, больные, дураки, нелюбящие",
+            "6": "Враги, больные, дураки",
             "7": "Конкуренты, противники",
             "8": "Жертвы моих манипуляций",
             "9": "Коллеги, начальники",
             "10": "Команда, последователи",
-            "J": "Ученики, пациенты, подопечные",
+            "J": "Ученики, пациенты",
             "Q": "Мастера и ученики",
             "K": "Создатели, идеологи",
             "A": "Все и никто"
         }
     },
-    
-    # ========== УРОВЕНЬ 2: ПОВЕДЕНИЕ (2 вопроса) ==========
     {
         "level": "🏃 УРОВЕНЬ 2: ПОВЕДЕНИЕ",
         "text": "Что ты делаешь каждый день?",
         "options": {
-            "6": "Терплю, болею, тупею, страдаю",
-            "7": "Дерусь, лечусь, спорю, ищу любовь",
+            "6": "Терплю, болею, страдаю",
+            "7": "Дерусь, лечусь, спорю",
             "8": "Манипулирую, интригую",
             "9": "Работаю по правилам",
             "10": "Веду команду",
-            "J": "Выполняю роль (воин/целитель/учитель)",
+            "J": "Выполняю роль",
             "Q": "Обучаю мастерству",
             "K": "Создаю системы",
             "A": "Живу"
@@ -355,8 +337,8 @@ STAGE_2_QUESTIONS = [
         "level": "🏃 УРОВЕНЬ 2: ПОВЕДЕНИЕ",
         "text": "Как ты проводишь свободное время?",
         "options": {
-            "6": "Жалуюсь, болею, тупею, страдаю",
-            "7": "Дерусь, лечусь, учусь, ищу любовь",
+            "6": "Жалуюсь, болею, страдаю",
+            "7": "Дерусь, лечусь, учусь",
             "8": "Плету интриги",
             "9": "Отдыхаю по расписанию",
             "10": "Веду проекты",
@@ -366,18 +348,16 @@ STAGE_2_QUESTIONS = [
             "A": "Просто есть"
         }
     },
-    
-    # ========== УРОВЕНЬ 3: СПОСОБНОСТИ (2 вопроса) ==========
     {
         "level": "💪 УРОВЕНЬ 3: СПОСОБНОСТИ",
         "text": "Что ты умеешь?",
         "options": {
-            "6": "Терпеть, болеть, не понимать, страдать",
-            "7": "Драться, терпеть боль, спорить, искать любовь",
-            "8": "Манипулировать, интриговать",
+            "6": "Терпеть, болеть, страдать",
+            "7": "Драться, терпеть боль",
+            "8": "Манипулировать",
             "9": "Работать по правилам",
             "10": "Вести людей",
-            "J": "Воевать/лечить/учить безупречно",
+            "J": "Воевать, лечить, учить",
             "Q": "Передавать мастерство",
             "K": "Создавать системы",
             "A": "Всё и ничего"
@@ -388,28 +368,26 @@ STAGE_2_QUESTIONS = [
         "text": "Чему ты можешь научить?",
         "options": {
             "6": "Ничему. Я сам ничего не умею",
-            "7": "Как драться/терпеть/спорить",
+            "7": "Как драться, терпеть",
             "8": "Как манипулировать",
             "9": "Как работать по правилам",
             "10": "Как вести людей",
-            "J": "Как быть воином/целителем/учителем",
+            "J": "Как быть воином, целителем",
             "Q": "Как стать мастером",
             "K": "Как создать новую систему",
             "A": "Как быть свободным"
         }
     },
-    
-    # ========== УРОВЕНЬ 4: УБЕЖДЕНИЯ (2 вопроса) ==========
     {
         "level": "🧠 УРОВЕНЬ 4: УБЕЖДЕНИЯ",
         "text": "Во что ты веришь?",
         "options": {
-            "6": "Мир жесток. Я слабый/больной/глупый/нелюбимый",
-            "7": "Надо драться/лечиться/учиться/искать любовь",
-            "8": "Сила/здоровье/знание/любовь — это власть",
+            "6": "Мир жесток. Я слабый",
+            "7": "Надо драться, лечиться",
+            "8": "Сила — это власть",
             "9": "Надо следовать правилам",
             "10": "Я могу вести людей",
-            "J": "Я воин/целитель/учитель. Это моя миссия",
+            "J": "Я воин, целитель, учитель",
             "Q": "Я мастер. Я передаю знания",
             "K": "Я создаю новый мир",
             "A": "Всё — иллюзия"
@@ -421,7 +399,7 @@ STAGE_2_QUESTIONS = [
         "options": {
             "6": "Потому что я не могу иначе",
             "7": "Потому что надо выживать",
-            "8": "Потому что так я контролирую ситуацию",
+            "8": "Потому что так я контролирую",
             "9": "Потому что так правильно",
             "10": "Потому что люди идут за мной",
             "J": "Потому что это моя роль",
@@ -430,20 +408,18 @@ STAGE_2_QUESTIONS = [
             "A": "Потому что я свободен"
         }
     },
-    
-    # ========== УРОВЕНЬ 5: ИДЕНТИЧНОСТЬ (2 вопроса) ==========
     {
         "level": "👤 УРОВЕНЬ 5: ИДЕНТИЧНОСТЬ",
         "text": "Кто ты?",
         "options": {
-            "6": "Жертва/больной/дурак/нелюбимый",
-            "7": "Боец/борец с болью/спорщик/охотник за любовью",
+            "6": "Жертва, больной, дурак",
+            "7": "Боец, борец",
             "8": "Манипулятор",
-            "9": "Профессионал/зожник/эксперт/партнёр",
-            "10": "Лидер/атлет/мыслитель/любящий",
-            "J": "Воин/целитель/учитель",
+            "9": "Профессионал, эксперт",
+            "10": "Лидер, мыслитель",
+            "J": "Воин, целитель, учитель",
             "Q": "Мастер",
-            "K": "Создатель/законодатель",
+            "K": "Создатель, законодатель",
             "A": "Никто и все"
         }
     },
@@ -451,19 +427,17 @@ STAGE_2_QUESTIONS = [
         "level": "👤 УРОВЕНЬ 5: ИДЕНТИЧНОСТЬ",
         "text": "Как ты себя называешь?",
         "options": {
-            "6": "Я неудачник/больной/тупой/нелюбимый",
-            "7": "Я боец/борец/спорщик/искатель",
-            "8": "Я игрок/кукловод",
-            "9": "Я профессионал/зожник/эксперт/партнёр",
-            "10": "Я лидер/атлет/мыслитель/любящий",
-            "J": "Я воин/целитель/учитель",
+            "6": "Я неудачник, больной",
+            "7": "Я боец, борец",
+            "8": "Я игрок, кукловод",
+            "9": "Я профессионал, эксперт",
+            "10": "Я лидер, мыслитель",
+            "J": "Я воин, целитель, учитель",
             "Q": "Я мастер",
             "K": "Я создатель",
             "A": "Я — это я"
         }
     },
-    
-    # ========== УРОВЕНЬ 6: МИССИЯ (2 вопроса) ==========
     {
         "level": "🎯 УРОВЕНЬ 6: МИССИЯ",
         "text": "Зачем ты здесь?",
@@ -473,7 +447,7 @@ STAGE_2_QUESTIONS = [
             "8": "Чтобы контролировать",
             "9": "Чтобы работать",
             "10": "Чтобы вести людей",
-            "J": "Чтобы защищать/лечить/учить",
+            "J": "Чтобы защищать, лечить, учить",
             "Q": "Чтобы передавать мастерство",
             "K": "Чтобы создать новый мир",
             "A": "Чтобы быть"
@@ -497,10 +471,9 @@ STAGE_2_QUESTIONS = [
 ]
 
 # ========== ФУНКЦИИ ==========
-
-def calculate_progress(current_question: int, total_questions: int) -> str:
-    """Вычисляет прогресс в процентах"""
-    progress = int((current_question / total_questions) * 100)
+def calculate_progress(current: int, total: int) -> str:
+    """Вычисляет прогресс"""
+    progress = int((current / total) * 100)
     filled = int(progress / 10)
     bar = "▓" * filled + "░" * (10 - filled)
     return f"{bar} {progress}%"
@@ -508,194 +481,127 @@ def calculate_progress(current_question: int, total_questions: int) -> str:
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Команда /start"""
     user = update.effective_user
-    
-    welcome_text = f"""
-🃏 **ДОБРО ПОЖАЛОВАТЬ В КАРТОЧНЫЙ ТЕСТ АРХЕТИПОВ!**
-
-Привет, {user.first_name}! 👋
-
-Этот тест поможет тебе понять:
-• **Кто ты** на самом деле
-• **Почему** ты так живёшь
-• **Что** тебя останавливает
-• **Как** выйти на новый уровень
-
-📊 **Структура теста:**
-
-**ЭТАП 1: Определение программы (24 вопроса)**
-• Блок 1: Детские раны (4 вопроса)
-• Блок 2: Базовый страх (4 вопроса)
-• Блок 3: Стратегия выживания (4 вопроса)
-• Блок 4: Отношения (4 вопроса)
-• Блок 5: Деньги и свобода (4 вопроса)
-• Блок 6: Миссия (4 вопроса)
-
-**ЭТАП 2: Определение уровня (12 вопросов)**
-• 6 уровней по пирамиде Дилтса
-• От окружения до миссии
-
-⏱️ **Время прохождения:** 10-15 минут
-
-🎯 **Результат:** Твой архетип + подробное описание + план роста
-
-Готов узнать правду о себе?
-"""
-    
+    welcome_text = (
+        f"🃏 <b>ДОБРО ПОЖАЛОВАТЬ В КАРТОЧНЫЙ ТЕСТ АРХЕТИПОВ!</b>\n\n"
+        f"Привет, {user.first_name}! 👋\n\n"
+        f"Этот тест поможет тебе понять:\n"
+        f"• <b>Кто ты</b> на самом деле\n"
+        f"• <b>Почему</b> ты так живёшь\n"
+        f"• <b>Что</b> тебя останавливает\n"
+        f"• <b>Как</b> выйти на новый уровень\n\n"
+        f"📊 <b>Структура теста:</b>\n\n"
+        f"<b>ЭТАП 1: Определение программы (24 вопроса)</b>\n"
+        f"• Блок 1: Детские раны (4 вопроса)\n"
+        f"• Блок 2: Базовый страх (4 вопроса)\n"
+        f"• Блок 3: Стратегия выживания (4 вопроса)\n"
+        f"• Блок 4: Отношения (4 вопроса)\n"
+        f"• Блок 5: Деньги и свобода (4 вопроса)\n"
+        f"• Блок 6: Миссия (4 вопроса)\n\n"
+        f"<b>ЭТАП 2: Определение уровня (12 вопросов)</b>\n"
+        f"• 6 уровней по пирамиде Дилтса\n\n"
+        f"⏱️ <b>Время прохождения:</b> 10-15 минут\n"
+        f"🎯 <b>Результат:</b> Твой архетип + план роста\n\n"
+        f"Готов узнать правду о себе?"
+    )
     keyboard = [[InlineKeyboardButton("🚀 Начать тест", callback_data="start_test")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await update.message.reply_text(
-        welcome_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
+    await update.message.reply_text(welcome_text, reply_markup=reply_markup, parse_mode="HTML")
 
 async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Начало теста - БЛОК 1"""
+    """Начало теста"""
     query = update.callback_query
     await query.answer()
-    
-    # Инициализация данных
     context.user_data["stage_1_answers"] = {"СБ": 0, "ТФ": 0, "УБ": 0, "ЧВ": 0}
     context.user_data["stage_2_answers"] = {"6": 0, "7": 0, "8": 0, "9": 0, "10": 0, "J": 0, "Q": 0, "K": 0, "A": 0}
     context.user_data["current_block"] = "block_1"
     context.user_data["current_question"] = 0
     
-    # Показываем описание БЛОКА 1
     block = STAGE_1_QUESTIONS["block_1"]
-    intro_text = f"""
-{block['title']}
-
-{block['description']}
-
-Вопросов в блоке: 4
-Всего вопросов в ЭТАПЕ 1: 24
-
-Готов начать?
-"""
-    
+    intro_text = (
+        f"{block['title']}\n\n"
+        f"{block['description']}\n\n"
+        f"Вопросов в блоке: 4\n"
+        f"Всего вопросов в ЭТАПЕ 1: 24\n\n"
+        f"Готов начать?"
+    )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data="start_block_1")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        intro_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
-    
+    await query.edit_message_text(intro_text, reply_markup=reply_markup)
     return STAGE_1_BLOCK_1
 
 async def ask_stage_1_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Задаёт вопрос из ЭТАПА 1"""
+    """Задаёт вопрос ЭТАПА 1"""
     query = update.callback_query
     await query.answer()
     
     current_block = context.user_data["current_block"]
     current_question = context.user_data["current_question"]
-    
     block = STAGE_1_QUESTIONS[current_block]
     question = block["questions"][current_question]
     
-    # Вычисляем общий прогресс
     block_num = int(current_block.split("_")[1])
-    total_questions_done = (block_num - 1) * 4 + current_question
-    progress = calculate_progress(total_questions_done, 24)
+    total_done = (block_num - 1) * 4 + current_question
+    progress = calculate_progress(total_done, 24)
     
-    question_text = f"""
-{block['title']}
-
-**Вопрос {current_question + 1}/4:**
-
-{question['text']}
-
-{progress}
-"""
+    question_text = (
+        f"{block['title']}\n\n"
+        f"<b>Вопрос {current_question + 1}/4:</b>\n\n"
+        f"{question['text']}\n\n"
+        f"{progress}"
+    )
     
-    # Создаём кнопки с вариантами ответов
     keyboard = []
     for program, answer in question["options"].items():
-        keyboard.append([InlineKeyboardButton(
-            answer,
-            callback_data=f"stage1_{program}"
-        )])
-    
+        keyboard.append([InlineKeyboardButton(answer, callback_data=f"stage1_{program}")])
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        question_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
+    await query.edit_message_text(question_text, reply_markup=reply_markup, parse_mode="HTML")
 
 async def handle_stage_1_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработка ответа ЭТАПА 1"""
     query = update.callback_query
     await query.answer()
     
-    # Сохраняем ответ
     program = query.data.split("_")[1]
     context.user_data["stage_1_answers"][program] += 1
-    
-    # Переходим к следующему вопросу
     context.user_data["current_question"] += 1
+    
     current_block = context.user_data["current_block"]
     current_question = context.user_data["current_question"]
-    
     block = STAGE_1_QUESTIONS[current_block]
     
-    # Если блок закончен
     if current_question >= len(block["questions"]):
         return await finish_block(update, context)
-    
-    # Иначе задаём следующий вопрос
     return await ask_stage_1_question(update, context)
 
 async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Завершение блока"""
     query = update.callback_query
-    
     current_block = context.user_data["current_block"]
     block_num = int(current_block.split("_")[1])
     
-    # Если это последний блок ЭТАПА 1
     if block_num == 6:
         return await finish_stage_1(update, context)
     
-    # Иначе переходим к следующему блоку
     next_block = f"block_{block_num + 1}"
     context.user_data["current_block"] = next_block
     context.user_data["current_question"] = 0
-    
     block = STAGE_1_QUESTIONS[next_block]
     
-    completion_text = f"""
-✅ **БЛОК {block_num} ЗАВЕРШЁН!**
-
-Переходим к следующему блоку:
-
-{block['title']}
-
-{block['description']}
-
-Вопросов в блоке: 4
-"""
-    
+    completion_text = (
+        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n\n"
+        f"Переходим к следующему блоку:\n\n"
+        f"{block['title']}\n\n"
+        f"{block['description']}\n\n"
+        f"Вопросов в блоке: 4"
+    )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data=f"start_block_{block_num + 1}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        completion_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
-    
-    # Возвращаем состояние для следующего блока
+    await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="HTML")
     return STAGE_1_BLOCK_1 + block_num
 
 async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Завершение ЭТАПА 1 и определение программы"""
+    """Завершение ЭТАПА 1"""
     query = update.callback_query
-    
     answers = context.user_data["stage_1_answers"]
     program = max(answers, key=answers.get)
     
@@ -705,130 +611,78 @@ async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "УБ": "♣️ ПОЗНАВАТЕЛЬНАЯ ПРОГРАММА",
         "ЧВ": "♦️ ЭМОЦИОНАЛЬНАЯ ПРОГРАММА"
     }
-    
-    program_descriptions = {
-        "СБ": "Ты живёшь в мире силы. Хищник или жертва. Твоя задача — научиться управлять силой.",
-        "ТФ": "Ты живёшь в теле. Здоровье или болезнь. Твоя задача — научиться слушать тело.",
-        "УБ": "Ты живёшь в уме. Знание или незнание. Твоя задача — научиться познавать.",
-        "ЧВ": "Ты живёшь в сердце. Любовь или нелюбовь. Твоя задача — научиться любить."
+    program_desc = {
+        "СБ": "Ты живёшь в мире силы. Хищник или жертва.",
+        "ТФ": "Ты живёшь в теле. Здоровье или болезнь.",
+        "УБ": "Ты живёшь в уме. Знание или незнание.",
+        "ЧВ": "Ты живёшь в сердце. Любовь или нелюбовь."
     }
-    
     context.user_data["program"] = program
     
-    result_text = f"""
-🎉 **ЭТАП 1 ЗАВЕРШЁН!**
-
-Твоя базовая программа:
-
-**{program_names[program]}**
-
-{program_descriptions[program]}
-
----
-
-**Статистика ответов:**
-♠️ Силовая: {answers['СБ']}/24
-♥️ Телесная: {answers['ТФ']}/24
-♣️ Познавательная: {answers['УБ']}/24
-♦️ Эмоциональная: {answers['ЧВ']}/24
-
----
-
-Теперь определим твой уровень развития в этой программе.
-
-**ЭТАП 2: Определение уровня (12 вопросов)**
-
-Мы пройдём по 6 уровням пирамиды Дилтса:
-1. Окружение
-2. Поведение
-3. Способности
-4. Убеждения
-5. Идентичность
-6. Миссия
-
-Готов продолжить?
-"""
-    
+    result_text = (
+        f"🎉 <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n\n"
+        f"Твоя базовая программа:\n\n"
+        f"<b>{program_names[program]}</b>\n\n"
+        f"{program_desc[program]}\n\n"
+        f"<b>Статистика ответов:</b>\n"
+        f"♠️ Силовая: {answers['СБ']}/24\n"
+        f"♥️ Телесная: {answers['ТФ']}/24\n"
+        f"♣️ Познавательная: {answers['УБ']}/24\n"
+        f"♦️ Эмоциональная: {answers['ЧВ']}/24\n\n"
+        f"Теперь определим твой уровень развития.\n\n"
+        f"<b>ЭТАП 2: Определение уровня (12 вопросов)</b>\n\n"
+        f"Готов продолжить?"
+    )
     keyboard = [[InlineKeyboardButton("▶️ Начать ЭТАП 2", callback_data="start_stage_2")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        result_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
-    
+    await query.edit_message_text(result_text, reply_markup=reply_markup, parse_mode="HTML")
     return STAGE_2
 
 async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Начало ЭТАПА 2"""
     query = update.callback_query
     await query.answer()
-    
     context.user_data["current_question"] = 0
-    
     return await ask_stage_2_question(update, context)
 
 async def ask_stage_2_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Задаёт вопрос из ЭТАПА 2"""
+    """Задаёт вопрос ЭТАПА 2"""
     query = update.callback_query
     await query.answer()
     
     current_question = context.user_data["current_question"]
     question = STAGE_2_QUESTIONS[current_question]
-    
     progress = calculate_progress(current_question, 12)
     
-    question_text = f"""
-{question['level']}
-
-**Вопрос {current_question + 1}/12:**
-
-{question['text']}
-
-{progress}
-"""
-    
-    # Создаём кнопки с вариантами ответов
+    question_text = (
+        f"{question['level']}\n\n"
+        f"<b>Вопрос {current_question + 1}/12:</b>\n\n"
+        f"{question['text']}\n\n"
+        f"{progress}"
+    )
     keyboard = []
     for level, answer in question["options"].items():
-        keyboard.append([InlineKeyboardButton(
-            answer,
-            callback_data=f"stage2_{level}"
-        )])
-    
+        keyboard.append([InlineKeyboardButton(answer, callback_data=f"stage2_{level}")])
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        question_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
+    await query.edit_message_text(question_text, reply_markup=reply_markup, parse_mode="HTML")
 
 async def handle_stage_2_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработка ответа ЭТАПА 2"""
     query = update.callback_query
     await query.answer()
     
-    # Сохраняем ответ
     level = query.data.split("_")[1]
     context.user_data["stage_2_answers"][level] += 1
-    
-    # Переходим к следующему вопросу
     context.user_data["current_question"] += 1
     current_question = context.user_data["current_question"]
     
-    # Если тест закончен
     if current_question >= len(STAGE_2_QUESTIONS):
         return await show_result(update, context)
-    
-    # Иначе задаём следующий вопрос
     return await ask_stage_2_question(update, context)
 
 async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показ результата"""
     query = update.callback_query
-    
     program = context.user_data["program"]
     answers = context.user_data["stage_2_answers"]
     level = max(answers, key=answers.get)
@@ -840,79 +694,27 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text("Ошибка: архетип не найден")
         return ConversationHandler.END
     
-    result_text = f"""
-🎉 **ТВОЙ АРХЕТИП ОПРЕДЕЛЁН!**
-
-{archetype['card']} **{archetype['title']}**
-
----
-
-**КТО ТЫ:**
-{archetype['who']}
-
----
-
-**ТВОЙ НАРРАТИВ:**
-{archetype['narrative']}
-
----
-
-**ТЕНЕВАЯ СТОРОНА:**
-{archetype['shadow']}
-
----
-
-**ЛОВУШКА УРОВНЯ:**
-{archetype['trap']}
-
----
-
-**ЧТО ДЕЛАТЬ:**
-{archetype['what_to_do']}
-
----
-
-**КАК РАСТИ:**
-{archetype['how_to_grow']}
-
----
-
-**ТРИГГЕР ПЕРЕХОДА:**
-{archetype['trigger']}
-
----
-
-**ДЕНЬГИ:**
-{archetype['money']}
-
----
-
-**ТВОЯ СКАЗКА:**
-{archetype['fairy_tale']}
-
----
-
-📖 **Читать полное описание:**
-{archetype['link']}
-
----
-
-💬 **Хочешь разобраться глубже?**
-Напиши автору: @ziksa
-"""
-    
+    result_text = (
+        f"🎉 <b>ТВОЙ АРХЕТИП ОПРЕДЕЛЁН!</b>\n\n"
+        f"{archetype['card']} <b>{archetype['title']}</b>\n\n"
+        f"<b>КТО ТЫ:</b>\n{archetype['who']}\n\n"
+        f"<b>ТВОЙ НАРРАТИВ:</b>\n{archetype['narrative']}\n\n"
+        f"<b>ТЕНЕВАЯ СТОРОНА:</b>\n{archetype['shadow']}\n\n"
+        f"<b>ЛОВУШКА УРОВНЯ:</b>\n{archetype['trap']}\n\n"
+        f"<b>ЧТО ДЕЛАТЬ:</b>\n{archetype['what_to_do']}\n\n"
+        f"<b>КАК РАСТИ:</b>\n{archetype['how_to_grow']}\n\n"
+        f"<b>ТРИГГЕР ПЕРЕХОДА:</b>\n{archetype['trigger']}\n\n"
+        f"<b>ДЕНЬГИ:</b>\n{archetype['money']}\n\n"
+        f"<b>ТВОЯ СКАЗКА:</b>\n{archetype['fairy_tale']}\n\n"
+        f"📖 <b>Читать полное описание:</b>\n{archetype['link']}\n\n"
+        f"💬 <b>Хочешь разобраться глубже?</b>\nНапиши автору: @ziksa"
+    )
     keyboard = [
         [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")],
         [InlineKeyboardButton("💬 Написать автору", url="https://t.me/ziksa")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    
-    await query.edit_message_text(
-        result_text,
-        reply_markup=reply_markup,
-        parse_mode="Markdown"
-    )
-    
+    await query.edit_message_text(result_text, reply_markup=reply_markup, parse_mode="HTML")
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -923,8 +725,6 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     """Запуск бота"""
     application = Application.builder().token(TOKEN).build()
-    
-    # Обработчик разговора
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", start),
@@ -962,9 +762,7 @@ def main():
         },
         fallbacks=[CommandHandler("cancel", cancel)]
     )
-    
     application.add_handler(conv_handler)
-    
     logger.info("Бот запущен!")
     application.run_polling()
 
