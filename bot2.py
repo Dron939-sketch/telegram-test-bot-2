@@ -20,25 +20,25 @@ logger = logging.getLogger(__name__)
 # ЭТАП 1: Определение программы (24 вопроса)
 STAGE_1_QUESTIONS = [
     # Блок СБ (6 вопросов)
-    {"text": "Ты чувствуешь себя бессильным перед обстоятельствами?", "program": "СБ"},
+    {"text": "Ты чувствуешь себя бессильным?", "program": "СБ"},
     {"text": "Ты часто ввязываешься в конфликты?", "program": "СБ"},
-    {"text": "Ты манипулируешь людьми, чтобы получить желаемое?", "program": "СБ"},
+    {"text": "Ты манипулируешь людьми?", "program": "СБ"},
     {"text": "Ты следуешь правилам системы?", "program": "СБ"},
     {"text": "Люди идут за тобой?", "program": "СБ"},
     {"text": "Ты чувствуешь ответственность за других?", "program": "СБ"},
     
     # Блок ТФ (6 вопросов)
-    {"text": "Твоё тело часто болит или болеет?", "program": "ТФ"},
+    {"text": "Твоё тело часто болит?", "program": "ТФ"},
     {"text": "Ты терпишь физическую боль?", "program": "ТФ"},
-    {"text": "Ты зарабатываешь своим телом (спорт, красота, физический труд)?", "program": "ТФ"},
+    {"text": "Ты зарабатываешь своим телом?", "program": "ТФ"},
     {"text": "Ты следуешь правилам здорового образа жизни?", "program": "ТФ"},
     {"text": "Твоё тело — твоя гордость?", "program": "ТФ"},
-    {"text": "Ты помогаешь другим с их телом (врач, тренер, массажист)?", "program": "ТФ"},
+    {"text": "Ты помогаешь другим с их телом?", "program": "ТФ"},
     
     # Блок УБ (6 вопросов)
     {"text": "Ты часто не понимаешь, что происходит вокруг?", "program": "УБ"},
     {"text": "Ты любишь спорить и доказывать свою правоту?", "program": "УБ"},
-    {"text": "Ты используешь знания для манипуляций?", "program": "УБ"},
+    {"text": "Ты манипулируешь знаниями?", "program": "УБ"},
     {"text": "Ты эксперт в своей области?", "program": "УБ"},
     {"text": "Ты видишь связи между явлениями?", "program": "УБ"},
     {"text": "Ты передаёшь знания другим?", "program": "УБ"},
@@ -89,10 +89,11 @@ PROGRAM_DESCRIPTIONS = {
 # ============================================
 
 def get_progress_bar(current, total, length=10):
-    """Создаёт визуальную полосу прогресса"""
+    """Создаёт визуальную полосу прогресса с процентом"""
     filled = int(length * current / total)
     bar = "▰" * filled + "▱" * (length - filled)
-    return f"{bar} {current}/{total}"
+    percent = int(100 * current / total)
+    return f"{bar} {current}/{total} ({percent}%)"
 
 # ============================================
 # КОМАНДЫ БОТА
@@ -104,26 +105,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data.clear()
     
     welcome_text = f"""Привет, {user.first_name}! 👋
-
-🎴 Добро пожаловать в диагностику архетипов!
-
-Этот тест поможет определить твой текущий уровень развития.
-
+🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!
+Этот тест поможет определить твой текущий архетип.
 🎯 Что тебя ждёт:
-
-1️⃣ ЭТАП 1: Определение программы (24 вопроса)
-→ Узнаешь свою базовую программу (СБ, ТФ, УБ или ЧВ)
-
-2️⃣ ЭТАП 2: Определение уровня (12 вопросов)
-→ Найдём твой текущий уровень развития (6, 7, 8, 9, 10, J, Q, K, A)
-
+1️⃣ ЭТАП 1: Определение масти (24 вопроса)
+→ Узнаешь свою базовую программу (♠️ СБ, ♥️ ТФ, ♣️ УБ или ♦️ ЧВ)
+2️⃣ ЭТАП 2: Определение карты (12 вопросов)
+→ Найдём твою текущую карту (6, 7, 8, 9, 10, J, Q, K, A)
 3️⃣ Персональный архетип
 → Получишь полное описание + терапевтическую сказку
-
 ⏱ Займёт 10-15 минут
-
 📌 Отвечай честно, как есть сейчас, а не как хотелось бы.
-
 Готов начать?"""
     
     keyboard = [[InlineKeyboardButton("🚀 Начать тест", callback_data="start_test")]]
@@ -145,20 +137,15 @@ async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['stage_2_answers'] = []
     context.user_data['current_question'] = 0
     
-    intro_text = """🎯 ЭТАП 1: ОПРЕДЕЛЕНИЕ ПРОГРАММЫ
-
+    intro_text = """🎯 ЭТАП 1: ОПРЕДЕЛЕНИЕ МАСТИ
 Сейчас я задам тебе 24 вопроса, чтобы определить твою базовую программу.
-
 📋 Вопросы разделены на 4 блока:
 ♠️ Силовая программа (СБ) — 6 вопросов
 ♥️ Телесная программа (ТФ) — 6 вопросов
 ♣️ Познавательная программа (УБ) — 6 вопросов
 ♦️ Эмоциональная программа (ЧВ) — 6 вопросов
-
 ⚡ Отвечай быстро, первое, что приходит в голову.
-
 Здесь нет правильных или неправильных ответов!
-
 Готов?"""
     
     keyboard = [[InlineKeyboardButton("✅ Начать", callback_data="begin_stage_1")]]
@@ -196,14 +183,12 @@ async def send_stage_1_question(query, context):
     
     text = f"""ЭТАП 1 • {block}
 {progress}
-
 ❓ ВОПРОС {question_num + 1} из {len(STAGE_1_QUESTIONS)}
-
-💬 {question['text']}"""
+💬 **{question['text']}**"""
     
     keyboard = [
-        [InlineKeyboardButton("✅ Да", callback_data="s1_yes")],
-        [InlineKeyboardButton("❌ Нет", callback_data="s1_no")]
+        [InlineKeyboardButton("✅ Да, это про меня", callback_data="s1_yes")],
+        [InlineKeyboardButton("❌ Нет, не про меня", callback_data="s1_no")]
     ]
     
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -238,21 +223,13 @@ async def finish_stage_1(query, context):
         results_text += f"{PROGRAM_NAMES[prog]}: {count}/6\n"
     
     result_text = f"""✅ ЭТАП 1 ЗАВЕРШЁН!
-
-{results_text}
-🎯 Твоя основная программа:
+{results_text}🎯 Твоя основная масть:
 {PROGRAM_NAMES[program]}
-
 💡 {PROGRAM_DESCRIPTIONS[program]}
-
 ━━━━━━━━━━━━━━━━━━━━━━
-
-🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ УРОВНЯ
-
-Теперь определим твой уровень развития внутри этой программы.
-
-Это поможет понять, на каком этапе пути ты находишься сейчас.
-
+🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ
+Теперь определим твою карту внутри этой масти.
+Это покажет, на каком этапе пути ты находишься сейчас.
 Готов продолжить?"""
     
     keyboard = [[InlineKeyboardButton("✅ Начать этап 2", callback_data="begin_stage_2")]]
@@ -269,11 +246,9 @@ async def begin_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     
-    intro_text = """🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ УРОВНЯ
-
-Сейчас я задам тебе 12 вопросов, чтобы определить твой уровень развития.
-
-📊 Уровни развития:
+    intro_text = """🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ
+Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.
+📊 Карты (уровни):
 6 — Жертва
 7 — Боец
 8 — Манипулятор
@@ -283,9 +258,7 @@ J (Валет) — Мастер
 Q (Дама) — Учитель
 K (Король) — Создатель
 A (Туз) — Свободный
-
 ⚡ Отвечай честно, как есть сейчас.
-
 Готов?"""
     
     keyboard = [[InlineKeyboardButton("✅ Начать", callback_data="start_stage_2_questions")]]
@@ -311,16 +284,14 @@ async def send_stage_2_question(query, context):
     question = STAGE_2_QUESTIONS[question_num]
     progress = get_progress_bar(question_num, len(STAGE_2_QUESTIONS))
     
-    text = f"""ЭТАП 2 • Определение уровня
+    text = f"""ЭТАП 2 • Определение карты
 {progress}
-
 ❓ ВОПРОС {question_num + 1} из {len(STAGE_2_QUESTIONS)}
-
-💬 {question['text']}"""
+💬 **{question['text']}**"""
     
     keyboard = [
-        [InlineKeyboardButton("✅ Да", callback_data="s2_yes")],
-        [InlineKeyboardButton("❌ Нет", callback_data="s2_no")]
+        [InlineKeyboardButton("✅ Да, это про меня", callback_data="s2_yes")],
+        [InlineKeyboardButton("❌ Нет, не про меня", callback_data="s2_no")]
     ]
     
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -360,7 +331,7 @@ async def finish_stage_2(query, context):
     
     if not archetype:
         await query.edit_message_text(
-            f"❌ Ошибка: архетип {archetype_key} не найден.\n\n"
+            f"❌ Ошибка: архетип {archetype_key} не найден.\n"
             "Нажми /start, чтобы начать заново."
         )
         return
@@ -368,39 +339,27 @@ async def finish_stage_2(query, context):
     # Формируем результат
     result = (
         f"🎉 ТЕСТ ЗАВЕРШЁН!\n"
-        f"\n"
         f"🎴 Твой архетип:\n"
         f"{archetype['card']} {archetype['title']}\n"
-        f"\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"\n"
         f"👤 КТО ТЫ\n"
         f"{archetype['who']}\n"
-        f"\n"
         f"💭 НАРРАТИВ\n"
         f"{archetype['narrative']}\n"
-        f"\n"
         f"🌑 ТЕНЬ\n"
         f"{archetype['shadow']}\n"
-        f"\n"
         f"🪤 ЛОВУШКА\n"
         f"{archetype['trap']}\n"
-        f"\n"
         f"❓ ЧТО ДЕЛАТЬ\n"
         f"{archetype['what_to_do']}\n"
-        f"\n"
         f"📈 КАК РАСТИ\n"
         f"{archetype['how_to_grow']}\n"
-        f"\n"
         f"💰 ДЕНЬГИ\n"
         f"{archetype['money']}\n"
-        f"\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
-        f"\n"
         f"📖 ТЕРАПЕВТИЧЕСКАЯ СКАЗКА\n"
         f"{archetype['fairy_tale']}\n"
-        f"\n"
-        f"💡 Это не просто сказка, а инструмент для работы с бессознательным.\n"
+        f"💡 Это не просто сказка, а инструмент для работы с бессознательным."
     )
     
     keyboard = [
@@ -417,42 +376,31 @@ async def get_full_description(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer()
     
     cta_text = """🔮 ЭТО ТОЛЬКО ВЕРХУШКА АЙСБЕРГА
-
 Ты узнал свой архетип.
 Но настоящая магия — в персональной сказке.
-
 📖 Терапевтическая сказка — это не просто история.
 Это ключ к твоему бессознательному.
-
 Она:
 • Обходит защиты разума
 • Запускает внутренние изменения
 • Работает даже когда ты спишь
-
 ━━━━━━━━━━━━━━━━━━━━━━
-
 🎁 ЧТО ТЫ ПОЛУЧИШЬ:
-
 ✨ Полное описание твоего архетипа (15+ страниц)
 ✨ Персональная терапевтическая сказка под твою ситуацию
 ✨ Разбор твоих ловушек и теневых сторон
 ✨ План роста на ближайшие 3-6 месяцев
 ✨ Ответы на твои вопросы
-
 ━━━━━━━━━━━━━━━━━━━━━━
-
 📩 Связаться с автором:
 👤 Мейстер А.Ю.
-💬 @meister_username
-
+💬 @meysternlp
 ⚡ Количество мест ограничено
-
 ━━━━━━━━━━━━━━━━━━━━━━
-
 ✍️ Автор методики: Мейстер А.Ю."""
     
     keyboard = [
-        [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meister_username")],
+        [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
         [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
