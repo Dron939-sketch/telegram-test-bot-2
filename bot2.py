@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = "8565708517:AAEWHsi9DYOFwAv0QT6A8W07n82pZoLXQMY"
+TOKEN = 8565708517:AAEWHsi9DYOFwAv0QT6A8W07n82pZoLXQMY
 GOOGLE_DRIVE_FILE_ID = "1Y0nr2C_sWlQVOF84THLXa3nflFBVSI77"
 
 # Состояния
