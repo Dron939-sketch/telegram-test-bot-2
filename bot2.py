@@ -91,7 +91,7 @@ PROGRAM_DESCRIPTIONS = {
 def get_progress_bar(current, total, length=10):
     """Создаёт визуальную полосу прогресса"""
     filled = int(length * current / total)
-    bar = "█" * filled + "░" * (length - filled)
+    bar = "▰" * filled + "▱" * (length - filled)
     return f"{bar} {current}/{total}"
 
 # ============================================
@@ -111,14 +111,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 🎯 Что тебя ждёт:
 
-1️⃣ **ЭТАП 1: Определение программы** (24 вопроса)
-   → Узнаешь свою базовую программу (СБ, ТФ, УБ или ЧВ)
+1️⃣ ЭТАП 1: Определение программы (24 вопроса)
+→ Узнаешь свою базовую программу (СБ, ТФ, УБ или ЧВ)
 
-2️⃣ **ЭТАП 2: Определение уровня** (12 вопросов)
-   → Найдём твой текущий уровень развития (6, 7, 8, 9, 10, J, Q, K, A)
+2️⃣ ЭТАП 2: Определение уровня (12 вопросов)
+→ Найдём твой текущий уровень развития (6, 7, 8, 9, 10, J, Q, K, A)
 
-3️⃣ **Персональный архетип**
-   → Получишь полное описание + сказку для работы
+3️⃣ Персональный архетип
+→ Получишь полное описание + терапевтическую сказку
 
 ⏱ Займёт 10-15 минут
 
@@ -145,15 +145,15 @@ async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['stage_2_answers'] = []
     context.user_data['current_question'] = 0
     
-    intro_text = """🎯 **ЭТАП 1: ОПРЕДЕЛЕНИЕ ПРОГРАММЫ**
+    intro_text = """🎯 ЭТАП 1: ОПРЕДЕЛЕНИЕ ПРОГРАММЫ
 
 Сейчас я задам тебе 24 вопроса, чтобы определить твою базовую программу.
 
 📋 Вопросы разделены на 4 блока:
-• ♠️ Силовая программа (СБ) — 6 вопросов
-• ♥️ Телесная программа (ТФ) — 6 вопросов
-• ♣️ Познавательная программа (УБ) — 6 вопросов
-• ♦️ Эмоциональная программа (ЧВ) — 6 вопросов
+♠️ Силовая программа (СБ) — 6 вопросов
+♥️ Телесная программа (ТФ) — 6 вопросов
+♣️ Познавательная программа (УБ) — 6 вопросов
+♦️ Эмоциональная программа (ЧВ) — 6 вопросов
 
 ⚡ Отвечай быстро, первое, что приходит в голову.
 
@@ -186,23 +186,20 @@ async def send_stage_1_question(query, context):
     
     # Определяем текущий блок
     if question_num < 6:
-        block = "♠️ Блок СБ (Силовая программа)"
+        block = "♠️ Силовая программа"
     elif question_num < 12:
-        block = "♥️ Блок ТФ (Телесная программа)"
+        block = "♥️ Телесная программа"
     elif question_num < 18:
-        block = "♣️ Блок УБ (Познавательная программа)"
+        block = "♣️ Познавательная программа"
     else:
-        block = "♦️ Блок ЧВ (Эмоциональная программа)"
+        block = "♦️ Эмоциональная программа"
     
-    text = f"""📊 **ЭТАП 1: Определение программы**
-
-{block}
-
+    text = f"""ЭТАП 1 • {block}
 {progress}
 
-❓ **Вопрос {question_num + 1} из {len(STAGE_1_QUESTIONS)}:**
+❓ ВОПРОС {question_num + 1} из {len(STAGE_1_QUESTIONS)}
 
-{question['text']}"""
+💬 {question['text']}"""
     
     keyboard = [
         [InlineKeyboardButton("✅ Да", callback_data="s1_yes")],
@@ -225,25 +222,6 @@ async def handle_stage_1_answer(update: Update, context: ContextTypes.DEFAULT_TY
         context.user_data['stage_1_answers'][question['program']] += 1
     
     context.user_data['current_question'] += 1
-    
-    # Подбадривание каждые 6 вопросов (после каждого блока)
-    if (question_num + 1) % 6 == 0 and (question_num + 1) < len(STAGE_1_QUESTIONS):
-        block_num = (question_num + 1) // 6
-        encouragement = f"""✅ **Блок {block_num} завершён!**
-
-Отлично! Пройдено {question_num + 1} из 24 вопросов.
-
-Продолжаем следующий блок..."""
-        keyboard = [[InlineKeyboardButton("➡️ Продолжить", callback_data="continue_s1")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(encouragement, reply_markup=reply_markup)
-    else:
-        await send_stage_1_question(query, context)
-
-async def continue_s1(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Продолжает этап 1 после подбадривания"""
-    query = update.callback_query
-    await query.answer()
     await send_stage_1_question(query, context)
 
 async def finish_stage_1(query, context):
@@ -255,22 +233,21 @@ async def finish_stage_1(query, context):
     context.user_data['stage'] = 'stage_2'
     
     # Показываем результаты по всем программам
-    results_text = "📊 **Твои результаты по программам:**\n\n"
+    results_text = "📊 Твои результаты по программам:\n"
     for prog, count in sorted(answers.items(), key=lambda x: x[1], reverse=True):
         results_text += f"{PROGRAM_NAMES[prog]}: {count}/6\n"
     
-    result_text = f"""✅ **ЭТАП 1 ЗАВЕРШЁН!**
+    result_text = f"""✅ ЭТАП 1 ЗАВЕРШЁН!
 
 {results_text}
-
-🎯 **Твоя основная программа:**
+🎯 Твоя основная программа:
 {PROGRAM_NAMES[program]}
 
 💡 {PROGRAM_DESCRIPTIONS[program]}
 
----
+━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 **ЭТАП 2: ОПРЕДЕЛЕНИЕ УРОВНЯ**
+🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ УРОВНЯ
 
 Теперь определим твой уровень развития внутри этой программы.
 
@@ -292,20 +269,20 @@ async def begin_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
     
-    intro_text = """🎯 **ЭТАП 2: ОПРЕДЕЛЕНИЕ УРОВНЯ**
+    intro_text = """🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ УРОВНЯ
 
 Сейчас я задам тебе 12 вопросов, чтобы определить твой уровень развития.
 
 📊 Уровни развития:
-• 6 — Жертва
-• 7 — Боец
-• 8 — Манипулятор
-• 9 — Исполнитель
-• 10 — Лидер
-• J (Валет) — Мастер
-• Q (Дама) — Учитель
-• K (Король) — Создатель
-• A (Туз) — Свободный
+6 — Жертва
+7 — Боец
+8 — Манипулятор
+9 — Исполнитель
+10 — Лидер
+J (Валет) — Мастер
+Q (Дама) — Учитель
+K (Король) — Создатель
+A (Туз) — Свободный
 
 ⚡ Отвечай честно, как есть сейчас.
 
@@ -334,13 +311,12 @@ async def send_stage_2_question(query, context):
     question = STAGE_2_QUESTIONS[question_num]
     progress = get_progress_bar(question_num, len(STAGE_2_QUESTIONS))
     
-    text = f"""📊 **ЭТАП 2: Определение уровня**
-
+    text = f"""ЭТАП 2 • Определение уровня
 {progress}
 
-❓ **Вопрос {question_num + 1} из {len(STAGE_2_QUESTIONS)}:**
+❓ ВОПРОС {question_num + 1} из {len(STAGE_2_QUESTIONS)}
 
-{question['text']}"""
+💬 {question['text']}"""
     
     keyboard = [
         [InlineKeyboardButton("✅ Да", callback_data="s2_yes")],
@@ -363,24 +339,6 @@ async def handle_stage_2_answer(update: Update, context: ContextTypes.DEFAULT_TY
         context.user_data['stage_2_answers'].append(question['level'])
     
     context.user_data['current_question'] += 1
-    
-    # Подбадривание каждые 4 вопроса
-    if (question_num + 1) % 4 == 0 and (question_num + 1) < len(STAGE_2_QUESTIONS):
-        encouragement = f"""✅ **Отлично!**
-
-Пройдено {question_num + 1} из 12 вопросов.
-
-Продолжаем..."""
-        keyboard = [[InlineKeyboardButton("➡️ Продолжить", callback_data="continue_s2")]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(encouragement, reply_markup=reply_markup)
-    else:
-        await send_stage_2_question(query, context)
-
-async def continue_s2(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Продолжает этап 2 после подбадривания"""
-    query = update.callback_query
-    await query.answer()
     await send_stage_2_question(query, context)
 
 async def finish_stage_2(query, context):
@@ -402,36 +360,104 @@ async def finish_stage_2(query, context):
     
     if not archetype:
         await query.edit_message_text(
-            f"❌ **Ошибка:** архетип {archetype_key} не найден.\n\n"
+            f"❌ Ошибка: архетип {archetype_key} не найден.\n\n"
             "Нажми /start, чтобы начать заново."
         )
         return
     
     # Формируем результат
     result = (
-        f"🎉 **ТЕСТ ЗАВЕРШЁН!**\n\n"
-        f"🎴 **Твой архетип:**\n"
-        f"{archetype['card']} **{archetype['title']}**\n\n"
-        f"---\n\n"
-        f"👤 **КТО ТЫ:**\n{archetype['who']}\n\n"
-        f"💭 **НАРРАТИВ:**\n{archetype['narrative']}\n\n"
-        f"🌑 **ТЕНЬ:**\n{archetype['shadow']}\n\n"
-        f"🪤 **ЛОВУШКА:**\n{archetype['trap']}\n\n"
-        f"❓ **ЧТО ДЕЛАТЬ:**\n{archetype['what_to_do']}\n\n"
-        f"📈 **КАК РАСТИ:**\n{archetype['how_to_grow']}\n\n"
-        f"💰 **ДЕНЬГИ:**\n{archetype['money']}\n\n"
-        f"📖 **СКАЗКА:** {archetype['fairy_tale']}\n\n"
-        f"---\n\n"
-        f"✍️ Автор методики: Мейстер А.Ю."
+        f"🎉 ТЕСТ ЗАВЕРШЁН!\n"
+        f"\n"
+        f"🎴 Твой архетип:\n"
+        f"{archetype['card']} {archetype['title']}\n"
+        f"\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"\n"
+        f"👤 КТО ТЫ\n"
+        f"{archetype['who']}\n"
+        f"\n"
+        f"💭 НАРРАТИВ\n"
+        f"{archetype['narrative']}\n"
+        f"\n"
+        f"🌑 ТЕНЬ\n"
+        f"{archetype['shadow']}\n"
+        f"\n"
+        f"🪤 ЛОВУШКА\n"
+        f"{archetype['trap']}\n"
+        f"\n"
+        f"❓ ЧТО ДЕЛАТЬ\n"
+        f"{archetype['what_to_do']}\n"
+        f"\n"
+        f"📈 КАК РАСТИ\n"
+        f"{archetype['how_to_grow']}\n"
+        f"\n"
+        f"💰 ДЕНЬГИ\n"
+        f"{archetype['money']}\n"
+        f"\n"
+        f"━━━━━━━━━━━━━━━━━━━━━━\n"
+        f"\n"
+        f"📖 ТЕРАПЕВТИЧЕСКАЯ СКАЗКА\n"
+        f"{archetype['fairy_tale']}\n"
+        f"\n"
+        f"💡 Это не просто сказка, а инструмент для работы с бессознательным.\n"
     )
     
     keyboard = [
         [InlineKeyboardButton("📖 Открыть сказку", url=archetype['link'])],
-        [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
+        [InlineKeyboardButton("🎁 Получить полное описание", callback_data="get_full")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await query.edit_message_text(result, reply_markup=reply_markup, disable_web_page_preview=True)
+
+async def get_full_description(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Показывает призыв к действию"""
+    query = update.callback_query
+    await query.answer()
+    
+    cta_text = """🔮 ЭТО ТОЛЬКО ВЕРХУШКА АЙСБЕРГА
+
+Ты узнал свой архетип.
+Но настоящая магия — в персональной сказке.
+
+📖 Терапевтическая сказка — это не просто история.
+Это ключ к твоему бессознательному.
+
+Она:
+• Обходит защиты разума
+• Запускает внутренние изменения
+• Работает даже когда ты спишь
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🎁 ЧТО ТЫ ПОЛУЧИШЬ:
+
+✨ Полное описание твоего архетипа (15+ страниц)
+✨ Персональная терапевтическая сказка под твою ситуацию
+✨ Разбор твоих ловушек и теневых сторон
+✨ План роста на ближайшие 3-6 месяцев
+✨ Ответы на твои вопросы
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+📩 Связаться с автором:
+👤 Мейстер А.Ю.
+💬 @meister_username
+
+⚡ Количество мест ограничено
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+✍️ Автор методики: Мейстер А.Ю."""
+    
+    keyboard = [
+        [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meister_username")],
+        [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    await query.edit_message_text(cta_text, reply_markup=reply_markup)
 
 # ============================================
 # ОБРАБОТЧИК CALLBACK
@@ -445,10 +471,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     handlers = {
         "start_test": start_test,
         "begin_stage_1": begin_stage_1,
-        "continue_s1": continue_s1,
         "begin_stage_2": begin_stage_2,
         "start_stage_2_questions": start_stage_2_questions,
-        "continue_s2": continue_s2,
+        "get_full": get_full_description,
     }
     
     if data in handlers:
