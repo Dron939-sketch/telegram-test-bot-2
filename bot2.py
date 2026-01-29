@@ -494,22 +494,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Команда /start"""
     user = update.effective_user
     welcome_text = (
-        f"Привет, {user.first_name}! 👋\n\n"
-        f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n\n"
-        f"Этот тест поможет определить твой текущий архетип.\n\n"
-        f"🎯 Что тебя ждёт:\n\n"
+        f"Привет, {user.first_name}! 👋\n"
+        f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n"
+        f"Этот тест поможет определить твой текущий архетип.\n"
+        f"🎯 Что тебя ждёт:\n"
         f"1️⃣ ЭТАП 1: Определение масти (24 вопроса)\n"
-        f"→ Узнаешь свою базовую программу (♠️ СБ, ♥️ ТФ, ♣️ УБ или ♦️ ЧВ)\n\n"
+        f"→ Узнаешь свою базовую программу (♠️ СБ, ♥️ ТФ, ♣️ УБ или ♦️ ЧВ)\n"
         f"2️⃣ ЭТАП 2: Определение карты (12 вопросов)\n"
-        f"→ Найдём твою текущую карту (6, 7, 8, 9, 10, J, Q, K, A)\n\n"
+        f"→ Найдём твою текущую карту (6, 7, 8, 9, 10, J, Q, K, A)\n"
         f"3️⃣ Персональный архетип\n"
-        f"→ Получишь полное описание + терапевтическую сказку\n\n"
-        f"⏱ Займёт 10-15 минут\n\n"
-        f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"→ Получишь полное описание + терапевтическую сказку\n"
+        f"⏱ Займёт 10-15 минут\n"
+        f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n"
         f"✍️ Автор методики: Мейстер А.Ю.\n"
-        f"Психолог, специалист по архетипической психологии\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"Психолог, специалист по архетипической психологии\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("🚀 Начать тест", callback_data="start_test")]]
@@ -527,11 +525,8 @@ async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     block = STAGE_1_QUESTIONS["block_1"]
     intro_text = (
-        f"{block['title']}\n\n"
-        f"{block['description']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"Вопросов в блоке: 4\n"
-        f"Всего вопросов в ЭТАПЕ 1: 24\n\n"
+        f"{block['title']}\n"
+        f"{block['description']}\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data="start_block_1")]]
@@ -554,17 +549,14 @@ async def ask_stage_1_question(update: Update, context: ContextTypes.DEFAULT_TYP
     progress = calculate_progress(total_done, 24)
     
     question_text = (
-        f"{block['title']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"<b>Вопрос {current_question + 1}/4:</b>\n\n"
-        f"{question['text']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"{block['title']}\n"
+        f"Вопрос {current_question + 1}/4\n"
+        f"<b>{question['text']}</b>\n"
         f"{progress}"
     )
     
     keyboard = []
     for program, answer in question["options"].items():
-        # Сокращаем текст кнопок до 40 символов
         short_answer = answer[:37] + "..." if len(answer) > 40 else answer
         keyboard.append([InlineKeyboardButton(short_answer, callback_data=f"stage1_{program}")])
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -602,13 +594,10 @@ async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
     block = STAGE_1_QUESTIONS[next_block]
     
     completion_text = (
-        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"Переходим к следующему блоку:\n\n"
-        f"{block['title']}\n\n"
-        f"{block['description']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📊 Вопросов в блоке: 4"
+        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n"
+        f"Переходим к следующему блоку:\n"
+        f"{block['title']}\n"
+        f"{block['description']}"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data=f"start_block_{block_num + 1}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -635,22 +624,19 @@ async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
     context.user_data["program"] = program
     
-    results_text = "📊 Твои результаты по программам:\n\n"
+    results_text = "📊 Твои результаты по программам:\n"
     for prog in ["СБ", "ТФ", "УБ", "ЧВ"]:
         results_text += f"{program_names[prog]}: {answers[prog]}/24\n"
     
     result_text = (
-        f"✅ ЭТАП 1 ЗАВЕРШЁН!\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"{results_text}\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"🎯 Твоя основная масть:\n\n"
-        f"<b>{program_names[program]}</b>\n\n"
-        f"💡 {program_desc[program]}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ\n\n"
+        f"✅ ЭТАП 1 ЗАВЕРШЁН!\n"
+        f"{results_text}"
+        f"🎯 Твоя основная масть:\n"
+        f"<b>{program_names[program]}</b>\n"
+        f"💡 {program_desc[program]}\n"
+        f"🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ\n"
         f"Теперь определим твою карту внутри этой масти.\n"
-        f"Это покажет, на каком этапе пути ты находишься сейчас.\n\n"
+        f"Это покажет, на каком этапе пути ты находишься сейчас.\n"
         f"Готов продолжить?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать ЭТАП 2", callback_data="start_stage_2")]]
@@ -665,10 +651,9 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["current_question"] = 0
     
     intro_text = (
-        f"🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ\n\n"
-        f"Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📊 Карты (уровни):\n\n"
+        f"🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ\n"
+        f"Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.\n"
+        f"📊 Карты (уровни):\n"
         f"6 — Жертва\n"
         f"7 — Боец\n"
         f"8 — Манипулятор\n"
@@ -677,9 +662,8 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"J (Валет) — Мастер\n"
         f"Q (Дама) — Учитель\n"
         f"K (Король) — Создатель\n"
-        f"A (Туз) — Свободный\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"⚡ Отвечай честно, как есть сейчас.\n\n"
+        f"A (Туз) — Свободный\n"
+        f"⚡ Отвечай честно, как есть сейчас.\n"
         f"Готов?"
     )
     keyboard = [[InlineKeyboardButton("✅ Начать", callback_data="start_stage_2_questions")]]
@@ -703,11 +687,9 @@ async def ask_stage_2_question(update: Update, context: ContextTypes.DEFAULT_TYP
     
     question_text = (
         f"{question['level']}\n"
-        f"<i>{question['description']}</i>\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"<b>Вопрос {current_question + 1}/12:</b>\n\n"
-        f"{question['text']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"<i>{question['description']}</i>\n"
+        f"Вопрос {current_question + 1}/12\n"
+        f"<b>{question['text']}</b>\n"
         f"{progress}"
     )
     keyboard = []
@@ -743,9 +725,9 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not archetype:
         error_text = (
-            f"⚠️ Произошла ошибка при определении архетипа.\n\n"
+            f"⚠️ Произошла ошибка при определении архетипа.\n"
             f"Пожалуйста, пройдите тест заново или напишите автору:\n"
-            f"👉 @meysternlp\n\n"
+            f"👉 @meysternlp\n"
             f"Мы разберёмся и поможем!"
         )
         keyboard = [
@@ -757,50 +739,48 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ConversationHandler.END
     
     result_text = (
-        f"🎉 ТЕСТ ЗАВЕРШЁН!\n\n"
-        f"🎴 Твой архетип:\n\n"
-        f"{archetype['card']} {archetype['title']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📖 КТО ТЫ\n\n"
-        f"{archetype['who']}\n\n"
-        f"💭 НАРРАТИВ\n\n"
-        f"{archetype['narrative']}\n\n"
-        f"🌑 ТЕНЬ\n\n"
-        f"{archetype['shadow']}\n\n"
-        f"🪤 ЛОВУШКА\n\n"
-        f"{archetype['trap']}\n\n"
-        f"❓ ЧТО ДЕЛАТЬ\n\n"
-        f"{archetype['what_to_do']}\n\n"
-        f"📈 КАК РАСТИ\n\n"
-        f"{archetype['how_to_grow']}\n\n"
-        f"⚡ ТРИГГЕР ПЕРЕХОДА\n\n"
-        f"{archetype['trigger']}\n\n"
-        f"💰 ДЕНЬГИ\n\n"
-        f"{archetype['money']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📚 ТЕРАПЕВТИЧЕСКАЯ СКАЗКА\n\n"
-        f"{archetype['fairy_tale']}\n\n"
+        f"🎉 ТЕСТ ЗАВЕРШЁН!\n"
+        f"🎴 Твой архетип:\n"
+        f"{archetype['card']} {archetype['title']}\n"
+        f"📖 КТО ТЫ\n"
+        f"{archetype['who']}\n"
+        f"💭 НАРРАТИВ\n"
+        f"{archetype['narrative']}\n"
+        f"🌑 ТЕНЬ\n"
+        f"{archetype['shadow']}\n"
+        f"🪤 ЛОВУШКА\n"
+        f"{archetype['trap']}\n"
+        f"❓ ЧТО ДЕЛАТЬ\n"
+        f"{archetype['what_to_do']}\n"
+        f"📈 КАК РАСТИ\n"
+        f"{archetype['how_to_grow']}\n"
+        f"⚡ ТРИГГЕР ПЕРЕХОДА\n"
+        f"{archetype['trigger']}\n"
+        f"💰 ДЕНЬГИ\n"
+        f"{archetype['money']}\n"
+        f"📚 ТЕРАПЕВТИЧЕСКАЯ СКАЗКА\n"
+        f"{archetype['fairy_tale']}\n"
         f"💡 Это пример архетипической сказки.\n"
-        f"Хочешь получить персональную сказку, написанную специально для тебя?\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📖 Полное описание архетипа:\n"
-        f"{archetype['link']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"Хочешь получить персональную сказку, написанную специально для тебя?\n"
+        f"💎 ПОЛНЫЙ ПАКЕТ (990 ₽)\n"
+        f"✓ Полное описание архетипа (15+ страниц)\n"
+        f"✓ Персональная терапевтическая сказка (с твоим именем и ситуацией)\n"
+        f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (epub/pdf)\n"
         f"✍️ Автор методики: Мейстер А.Ю.\n"
-        f"Психолог, специалист по архетипической психологии\n\n"
+        f"Психолог, специалист по архетипической психологии\n"
         f"💬 Хочешь разобраться глубже?\n"
         f"Получить персональную сказку или консультацию:\n"
         f"👉 @meysternlp"
     )
     
-    # Создаём ссылку для шаринга
     bot_username = context.bot.username
     share_url = f"https://t.me/{bot_username}?start=share"
     
     keyboard = [
-        [InlineKeyboardButton("📖 Открыть сказку", url=archetype['link'])],
+        [InlineKeyboardButton("📖 Читать универсальную сказку", url=archetype['link'])],
+        [InlineKeyboardButton("💳 Получить полный пакет (990 ₽)", url="https://t.me/meysternlp")],
         [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
-        [InlineKeyboardButton("📤 Поделиться тестом с другом", url=share_url)],
+        [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)],
         [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -810,9 +790,9 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Отмена теста"""
     cancel_text = (
-        f"❌ Тест отменён.\n\n"
+        f"❌ Тест отменён.\n"
         f"Хочешь начать заново?\n"
-        f"👉 /start\n\n"
+        f"👉 /start\n"
         f"Или есть вопросы? Напиши автору:\n"
         f"👉 @meysternlp"
     )
