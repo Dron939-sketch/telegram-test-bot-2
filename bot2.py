@@ -1,3 +1,4 @@
+import os
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -16,7 +17,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = "8186888015:AAFfHXxJTlMPJOXNMJWAcBDlZJk6P1UBfEo"
+# ⚠️ ТОКЕН ИЗ ПЕРЕМЕННЫХ ОКРУЖЕНИЯ
+TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+if not TOKEN:
+    raise ValueError("❌ ОШИБКА: Переменная TELEGRAM_BOT_TOKEN не установлена!")
 
 # ========== СОСТОЯНИЯ ==========
 STAGE_1_BLOCK_1 = 1  # Детские раны
