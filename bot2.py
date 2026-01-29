@@ -13,15 +13,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# ✅ ТОКЕН ИЗ ПЕРЕМЕННЫХ ОКРУЖЕНИЯ
-TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN') or os.environ.get('BOT_TOKEN')
-
-# Отладка токена
-if TOKEN:
-    logger.info(f"✅ Токен найден: {TOKEN[:10]}...")
-else:
-    logger.error("❌ Токен не найден! Проверь переменные окружения.")
-
 # ============================================
 # ДАННЫЕ ТЕСТА
 # ============================================
@@ -473,24 +464,19 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     """Запуск бота"""
+    TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+    
     if not TOKEN:
         logger.error("❌ TELEGRAM_BOT_TOKEN не установлен!")
-        logger.error("Установи переменную окружения в Render Dashboard:")
-        logger.error("Environment → Add Environment Variable")
-        logger.error("Key: TELEGRAM_BOT_TOKEN")
-        logger.error("Value: твой_токен_от_BotFather")
         return
     
-    try:
-        application = Application.builder().token(TOKEN).build()
-        
-        application.add_handler(CommandHandler("start", start))
-        application.add_handler(CallbackQueryHandler(button_handler))
-        
-        logger.info("✅ Бот запущен успешно!")
-        application.run_polling(allowed_updates=Update.ALL_TYPES)
-    except Exception as e:
-        logger.error(f"❌ Ошибка при запуске бота: {e}")
+    application = Application.builder().token(TOKEN).build()
+    
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button_handler))
+    
+    logger.info("✅ Бот запущен!")
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main()
