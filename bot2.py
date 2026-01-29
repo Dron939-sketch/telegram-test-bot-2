@@ -1,22 +1,25 @@
+import os
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
     CallbackQueryHandler,
-    ContextTypes,
     ConversationHandler,
+    ContextTypes,
 )
 
-# ============= НАСТРОЙКИ =============
+# Настройка логирования
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-TOKEN = "8565708517:AAEWHsi9DYOFwAv0QT6A8W07n82pZoLXQMY"
-GOOGLE_DRIVE_FILE_ID = "1Y0nr2C_sWlQVOF84THLXa3nflFBVSI77"
+# Получение токена из переменных окружения
+TOKEN = os.getenv("TOKEN_BOT2")
+GOOGLE_DRIVE_FILE_ID = os.getenv("GOOGLE_DRIVE_FILE_ID", "1Y0nr2C_sWlQVOF84THLXa3nflFBVSI77")
+
 
 # Состояния
 STAGE_1, STAGE_2 = range(2)
