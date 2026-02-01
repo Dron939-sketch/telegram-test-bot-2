@@ -31,8 +31,9 @@ STAGE_2 = 2
 PROGRAM_DESCRIPTIONS = {
     "СБ": {
         "title": "⚔️ ПРОГРАММА СИЛЫ И КОНТРОЛЯ",
+        "config": "Власть/Сила | Контроль/Влияние",
         "description": (
-            "Ты живёшь в мире, где важно быть сильным.\n\n"
+            "Ты живёшь в мире, где важно быть сильным.\n"
             "Чувствуешь давление обстоятельств и людей. Твоя задача — удержать контроль, не дать себя сломать. "
             "Иногда ты борешься, иногда терпишь. Но главное — не показать слабость.\n\n"
             "🔍 <b>Как это проявляется:</b>\n"
@@ -51,8 +52,9 @@ PROGRAM_DESCRIPTIONS = {
     },
     "ТФ": {
         "title": "🌿 ПРОГРАММА ТЕЛА И КОМФОРТА",
+        "config": "Тело/Здоровье | Физические ощущения/Комфорт",
         "description": (
-            "Твоё тело — твой главный советник.\n\n"
+            "Твоё тело — твой главный советник.\n"
             "Ты чувствуешь усталость, напряжение, дискомфорт. Тебе важно, чтобы было хорошо физически. "
             "Ты заботишься о здоровье — своём или чужом. Когда телу плохо — всё плохо.\n\n"
             "🔍 <b>Как это проявляется:</b>\n"
@@ -71,8 +73,9 @@ PROGRAM_DESCRIPTIONS = {
     },
     "УБ": {
         "title": "🧠 ПРОГРАММА ЗНАНИЙ И ПОНИМАНИЯ",
+        "config": "Знания/Понимание | Логика/Анализ",
         "description": (
-            "Ты живёшь в голове.\n\n"
+            "Ты живёшь в голове.\n"
             "Тебе важно понять, как всё устроено. Ты анализируешь, ищешь логику, собираешь информацию. "
             "Непонимание вызывает тревогу. Знание — твоя опора в мире.\n\n"
             "🔍 <b>Как это проявляется:</b>\n"
@@ -92,8 +95,9 @@ PROGRAM_DESCRIPTIONS = {
     },
     "ЧВ": {
         "title": "❤️ ПРОГРАММА ЧУВСТВ И ОТНОШЕНИЙ",
+        "config": "Чувства/Отношения | Любовь/Привязанность",
         "description": (
-            "Ты живёшь сердцем.\n\n"
+            "Ты живёшь сердцем.\n"
             "Тебе важно быть любимым, нужным, принятым. Отношения — твоя главная ценность. "
             "Ты боишься одиночества и отвержения. Когда рядом тепло — ты жив.\n\n"
             "🔍 <b>Как это проявляется:</b>\n"
@@ -565,6 +569,19 @@ STAGE_2_QUESTIONS = [
     }
 ]
 
+# ========== ТОЛЕРАНТНЫЕ НАЗВАНИЯ УРОВНЕЙ ==========
+LEVEL_NAMES = {
+    "6": "Адаптирующийся",
+    "7": "Целеустремлённый",
+    "8": "Стратег",
+    "9": "Профессионал",
+    "10": "Вдохновитель",
+    "J": "Мастер",
+    "Q": "Наставник",
+    "K": "Новатор",
+    "A": "Свободный"
+}
+
 # ========== ФУНКЦИИ ==========
 def calculate_progress(current: int, total: int) -> str:
     """Вычисляет прогресс"""
@@ -578,20 +595,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     welcome_text = (
         f"Привет, {user.first_name}! 👋\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n\n"
         f"Этот тест поможет определить твой текущий архетип.\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"🎯 Что тебя ждёт:\n\n"
         f"1️⃣ ЭТАП 1: Определение конфигурации восприятия (24 вопроса)\n"
         f"→ Узнаешь свою базовую программу\n\n"
         f"2️⃣ ЭТАП 2: Определение конфигурации мышления (12 вопросов)\n"
         f"→ Найдём твою текущую программу\n"
         f"→ Определим поведенческие паттерны и методы их коррекции\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"⏱ Займёт 10-15 минут\n\n"
         f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("🚀 Начать тест", callback_data="start_test")]]
@@ -693,37 +706,20 @@ async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return STAGE_1
 
 async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Завершение ЭТАПА 1 с расширенным человеческим описанием"""
+    """Завершение ЭТАПА 1 с компактным описанием"""
     query = update.callback_query
     answers = context.user_data["stage_1_answers"]
     program = max(answers, key=answers.get)
     
     program_info = PROGRAM_DESCRIPTIONS[program]
-    
-    # ТЕХНИЧЕСКИЕ КООРДИНАТЫ
-    program_coords = {
-        "СБ": "X: Власть/Сила | Y: Контроль/Влияние",
-        "ТФ": "X: Тело/Здоровье | Y: Физические ощущения/Комфорт",
-        "УБ": "X: Знания/Понимание | Y: Логика/Анализ",
-        "ЧВ": "X: Чувства/Отношения | Y: Любовь/Привязанность"
-    }
-    
     context.user_data["program"] = program
-    
-    results_text = "📊 <b>Твои результаты (система координат):</b>\n\n"
-    for prog in ["СБ", "ТФ", "УБ", "ЧВ"]:
-        results_text += f"{program_coords[prog]}: {answers[prog]}/24\n"
     
     result_text = (
         f"✅ <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n\n"
-        f"{results_text}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"🎯 <b>Конфигурация восприятия:</b>\n"
+        f"{program_info['config']}\n\n"
         f"<b>{program_info['title']}</b>\n\n"
         f"{program_info['description']}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"🎯 <b>Твоя основная конфигурация восприятия:</b>\n"
-        f"{program_coords[program]}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n\n"
         f"Теперь определим логику мышления в этой системе восприятия.\n"
         f"Это покажет твои убеждения, ценности и паттерны поведения.\n\n"
@@ -743,16 +739,16 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     intro_text = (
         f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n\n"
         f"Сейчас я задам тебе 12 вопросов, чтобы определить твой тип мышления.\n\n"
-        f"📊 <b>Уровни:</b>\n"
-        f"6️⃣ Жертва\n"
-        f"7️⃣ Боец\n"
-        f"8️⃣ Манипулятор\n"
-        f"9️⃣ Исполнитель\n"
-        f"🔟 Лидер\n"
-        f"🃏 Мастер\n"
-        f"👑 Учитель\n"
-        f"🎨 Создатель\n"
-        f"🌟 Свободный\n\n"
+        f"📊 <b>Типы мышления:</b>\n"
+        f"• Адаптирующийся\n"
+        f"• Целеустремлённый\n"
+        f"• Стратег\n"
+        f"• Профессионал\n"
+        f"• Вдохновитель\n"
+        f"• Мастер\n"
+        f"• Наставник\n"
+        f"• Новатор\n"
+        f"• Свободный\n\n"
         f"⚡ Отвечай честно, как есть сейчас.\n\n"
         f"Готов?"
     )
@@ -828,37 +824,35 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(error_text, reply_markup=reply_markup, parse_mode="HTML")
         return ConversationHandler.END
     
-    # КОМПАКТНЫЙ РЕЗУЛЬТАТ БЕЗ РАМОК
+    level_name = LEVEL_NAMES.get(level, level)
+    
+    # КОМПАКТНЫЙ РЕЗУЛЬТАТ
     result_text = (
         f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n\n"
-        f"🎴 <b>Твой архетип:</b>\n"
+        f"📖 <b>Описание вашей конфигурации мышления и поведения</b>\n"
         f"{archetype.get('card', '')} {archetype.get('title', '')}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
-        f"📖 <b>КТО ТЫ</b>\n"
+        f"<b>КТО ТЫ</b>\n"
         f"{archetype.get('who', '')}\n\n"
-        f"💭 <b>НАРРАТИВ</b>\n"
+        f"<b>НАРРАТИВ</b>\n"
         f"{archetype.get('narrative', '')}\n\n"
-        f"🌑 <b>ТЕНЬ</b>\n"
+        f"<b>ТЕНЬ</b>\n"
         f"{archetype.get('shadow', '')}\n\n"
-        f"🪤 <b>ЛОВУШКА</b>\n"
+        f"<b>ЛОВУШКА</b>\n"
         f"{archetype.get('trap', '')}\n\n"
-        f"❓ <b>ЧТО ДЕЛАТЬ</b>\n"
+        f"<b>ЧТО ДЕЛАТЬ</b>\n"
         f"{archetype.get('what_to_do', '')}\n\n"
-        f"📈 <b>КАК РАСТИ</b>\n"
+        f"<b>КАК РАСТИ</b>\n"
         f"{archetype.get('how_to_grow', '')}\n\n"
-        f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n"
+        f"<b>ТРИГГЕР ПЕРЕХОДА</b>\n"
         f"{archetype.get('trigger', '')}\n\n"
-        f"💰 <b>ДЕНЬГИ</b>\n"
+        f"<b>ДЕНЬГИ</b>\n"
         f"{archetype.get('money', '')}\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"📚 <b>РАБОЧИЙ ИНСТРУМЕНТ КОРРЕКЦИИ</b>\n"
         f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"💎 <b>ПОЛНЫЙ ПАКЕТ (960 ₽)</b>\n"
         f"✓ Полное описание архетипа и персональные рекомендации (15+ страниц)\n"
         f"✓ Персональная терапевтическая сказка для коррекции других конфликтующих частей\n"
         f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n\n"
         f"💬 Хочешь разобраться глубже?\n"
         f"Получить персональную консультацию:\n"
         f"👉 @meysternlp"
@@ -868,37 +862,33 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(result_text) > 4096:
         part1 = (
             f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n\n"
-            f"🎴 <b>Твой архетип:</b>\n"
+            f"📖 <b>Описание вашей конфигурации мышления и поведения</b>\n"
             f"{archetype.get('card', '')} {archetype.get('title', '')}\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n\n"
-            f"📖 <b>КТО ТЫ</b>\n"
+            f"<b>КТО ТЫ</b>\n"
             f"{archetype.get('who', '')}\n\n"
-            f"💭 <b>НАРРАТИВ</b>\n"
+            f"<b>НАРРАТИВ</b>\n"
             f"{archetype.get('narrative', '')}\n\n"
-            f"🌑 <b>ТЕНЬ</b>\n"
+            f"<b>ТЕНЬ</b>\n"
             f"{archetype.get('shadow', '')}\n\n"
-            f"🪤 <b>ЛОВУШКА</b>\n"
+            f"<b>ЛОВУШКА</b>\n"
             f"{archetype.get('trap', '')}"
         )
         
         part2 = (
-            f"❓ <b>ЧТО ДЕЛАТЬ</b>\n"
+            f"<b>ЧТО ДЕЛАТЬ</b>\n"
             f"{archetype.get('what_to_do', '')}\n\n"
-            f"📈 <b>КАК РАСТИ</b>\n"
+            f"<b>КАК РАСТИ</b>\n"
             f"{archetype.get('how_to_grow', '')}\n\n"
-            f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n"
+            f"<b>ТРИГГЕР ПЕРЕХОДА</b>\n"
             f"{archetype.get('trigger', '')}\n\n"
-            f"💰 <b>ДЕНЬГИ</b>\n"
+            f"<b>ДЕНЬГИ</b>\n"
             f"{archetype.get('money', '')}\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n\n"
             f"📚 <b>РАБОЧИЙ ИНСТРУМЕНТ КОРРЕКЦИИ</b>\n"
             f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n\n"
             f"💎 <b>ПОЛНЫЙ ПАКЕТ (960 ₽)</b>\n"
             f"✓ Полное описание архетипа и персональные рекомендации (15+ страниц)\n"
             f"✓ Персональная терапевтическая сказка для коррекции других конфликтующих частей\n"
             f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n\n"
             f"💬 Хочешь разобраться глубже?\n"
             f"Получить персональную консультацию:\n"
             f"👉 @meysternlp"
@@ -906,25 +896,19 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         await query.message.reply_text(part1, parse_mode="HTML")
         
-        # ИСПРАВЛЕННАЯ ССЫЛКА НА БОТА
-        share_url = "https://t.me/VARIATUCA_bot?start=share"
-        
         keyboard = [
             [InlineKeyboardButton("📖 Читать сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
             [InlineKeyboardButton("💳 Получить полный пакет (960 ₽)", url="https://t.me/meysternlp")],
-            [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)]
+            [InlineKeyboardButton("📤 Поделиться тестом", url="https://t.me/share/url?url=https://t.me/VARIATUCA_bot&text=Пройди тест и узнай свой архетип!")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await query.message.reply_text(part2, reply_markup=reply_markup, parse_mode="HTML", disable_web_page_preview=True)
     else:
-        # ИСПРАВЛЕННАЯ ССЫЛКА НА БОТА
-        share_url = "https://t.me/VARIATUCA_bot?start=share"
-        
         keyboard = [
             [InlineKeyboardButton("📖 Читать сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
             [InlineKeyboardButton("💳 Получить полный пакет (960 ₽)", url="https://t.me/meysternlp")],
-            [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)]
+            [InlineKeyboardButton("📤 Поделиться тестом", url="https://t.me/share/url?url=https://t.me/VARIATUCA_bot&text=Пройди тест и узнай свой архетип!")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
