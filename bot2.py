@@ -495,12 +495,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n"
         f"Этот тест поможет определить твой текущий архетип.\n"
         f"🎯 <b>Что тебя ждёт:</b>\n"
-        f"1️⃣ ЭТАП 1: Определение масти (24 вопроса)\n"
-        f"→ Узнаешь свою базовую программу (♠️ СБ, ♥️ ТФ, ♣️ УБ или ♦️ ЧВ)\n"
-        f"2️⃣ ЭТАП 2: Определение карты (12 вопросов)\n"
-        f"→ Найдём твою текущую карту (6, 7, 8, 9, 10, J, Q, K, A)\n"
-        f"3️⃣ Персональный архетип\n"
-        f"→ Получишь полное описание + терапевтическую сказку\n"
+        f"1️⃣ ЭТАП 1: Определение конфигурации восприятия (24 вопроса)\n"
+        f"→ Узнаешь свою базовую программу\n"
+        f"2️⃣ ЭТАП 2: Определение конфигурации мышления (12 вопросов)\n"
+        f"→ Найдём твою текущую программу\n"
+        f"→ Определим поведенческие паттерны и методы их коррекции\n"
         f"⏱ Займёт 10-15 минут\n"
         f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n"
         f"Готов начать?"
@@ -547,7 +546,6 @@ async def ask_stage_1_question(update: Update, context: ContextTypes.DEFAULT_TYP
     
     question_text = (
         f"<b>{block['title']}</b>\n"
-        f"Вопрос {current_question + 1}/4\n"
         f"<b>{question['text']}</b>\n"
         f"{progress}"
     )
@@ -631,11 +629,11 @@ async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     result_text = (
         f"✅ <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n"
         f"{results_text}"
-        f"🎯 <b>Твоя основная масть:</b>\n"
+        f"🎯 <b>Твоя основная конфигурация восприятия:</b>\n"
         f"{program_names[program]}\n"
         f"💡 {program_desc[program]}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ</b>\n"
+        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n"
         f"Теперь определим твою карту внутри этой масти.\n"
         f"Это покажет, на каком этапе пути ты находишься сейчас.\n"
         f"Готов продолжить?"
@@ -652,7 +650,7 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["current_question"] = 0
     
     intro_text = (
-        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ</b>\n"
+        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n"
         f"Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.\n"
         f"📊 <b>Карты (уровни):</b>\n"
         f"6 — Жертва\n"
@@ -690,7 +688,6 @@ async def ask_stage_2_question(update: Update, context: ContextTypes.DEFAULT_TYP
     question_text = (
         f"<b>{question['level']}</b>\n"
         f"<i>{question['description']}</i>\n"
-        f"Вопрос {current_question + 1}/12\n"
         f"<b>{question['text']}</b>\n"
         f"{progress}"
     )
@@ -743,13 +740,10 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(error_text, reply_markup=reply_markup, parse_mode="HTML")
         return ConversationHandler.END
     
-    # КОМПАКТНЫЙ РЕЗУЛЬТАТ В ОДНОМ СООБЩЕНИИ
-    fairy_tale = archetype.get('fairy_tale', '')
-    fairy_tale_preview = fairy_tale[:800] + "..." if len(fairy_tale) > 800 else fairy_tale
-    
+    # КОМПАКТНЫЙ РЕЗУЛЬТАТ
     result_text = (
         f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n"
-        f"🎴 <b>Твой архетип:</b> {archetype.get('card', '')} {archetype.get('title', '')}\n"
+        f"🎴 <b>Твой архетип:</b>\n{archetype.get('card', '')} {archetype.get('title', '')}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"📖 <b>КТО ТЫ</b>\n{archetype.get('who', '')}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
@@ -767,14 +761,16 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"💰 <b>ДЕНЬГИ</b>\n{archetype.get('money', '')}\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"📚 <b>ТВОЯ ТЕРАПЕВТИЧЕСКАЯ СКАЗКА</b>\n"
-        f"Для твоего архетипа главный инструмент — терапевтическая сказка. "
-        f"Она работает с бессознательным, обходя сознательный контроль, "
-        f"и помогает интегрировать новые паттерны поведения.\n"
-        f"{fairy_tale_preview}\n"
+        f"📚 <b>РАБОЧИЙ ИНСТРУМЕНТ КОРРЕКЦИИ</b>\n"
+        f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"💎 <b>ПОЛНЫЙ ПАКЕТ (960 ₽)</b>\n"
+        f"✓ Полное описание архетипа и персональные рекомендации (15+ страниц)\n"
+        f"✓ Персональная терапевтическая сказка для коррекции других конфликтующих частей\n"
+        f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n"
         f"━━━━━━━━━━━━━━━━━━━━\n"
         f"💬 Хочешь разобраться глубже?\n"
-        f"Получить полный пакет или консультацию:\n"
+        f"Получить персональную консультацию:\n"
         f"👉 @meysternlp"
     )
     
@@ -782,7 +778,7 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(result_text) > 4096:
         part1 = (
             f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n"
-            f"🎴 <b>Твой архетип:</b> {archetype.get('card', '')} {archetype.get('title', '')}\n"
+            f"🎴 <b>Твой архетип:</b>\n{archetype.get('card', '')} {archetype.get('title', '')}\n"
             f"━━━━━━━━━━━━━━━━━━━━\n"
             f"📖 <b>КТО ТЫ</b>\n{archetype.get('who', '')}\n"
             f"━━━━━━━━━━━━━━━━━━━━\n"
@@ -802,14 +798,16 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"━━━━━━━━━━━━━━━━━━━━\n"
             f"💰 <b>ДЕНЬГИ</b>\n{archetype.get('money', '')}\n"
             f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"📚 <b>ТВОЯ ТЕРАПЕВТИЧЕСКАЯ СКАЗКА</b>\n"
-            f"Для твоего архетипа главный инструмент — терапевтическая сказка. "
-            f"Она работает с бессознательным, обходя сознательный контроль, "
-            f"и помогает интегрировать новые паттерны поведения.\n"
-            f"{fairy_tale_preview}\n"
+            f"📚 <b>РАБОЧИЙ ИНСТРУМЕНТ КОРРЕКЦИИ</b>\n"
+            f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n"
+            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"💎 <b>ПОЛНЫЙ ПАКЕТ (960 ₽)</b>\n"
+            f"✓ Полное описание архетипа и персональные рекомендации (15+ страниц)\n"
+            f"✓ Персональная терапевтическая сказка для коррекции других конфликтующих частей\n"
+            f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n"
             f"━━━━━━━━━━━━━━━━━━━━\n"
             f"💬 Хочешь разобраться глубже?\n"
-            f"Получить полный пакет или консультацию:\n"
+            f"Получить персональную консультацию:\n"
             f"👉 @meysternlp"
         )
         
@@ -819,8 +817,7 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         share_url = f"https://t.me/{bot_username}?start=share"
         
         keyboard = [
-            [InlineKeyboardButton("📖 Читать полную сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
-            [InlineKeyboardButton("💳 Получить полный пакет (990 ₽)", url="https://t.me/meysternlp")],
+            [InlineKeyboardButton("💳 Получить полный пакет (960 ₽)", url="https://t.me/meysternlp")],
             [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
             [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)],
             [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
@@ -833,8 +830,7 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         share_url = f"https://t.me/{bot_username}?start=share"
         
         keyboard = [
-            [InlineKeyboardButton("📖 Читать полную сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
-            [InlineKeyboardButton("💳 Получить полный пакет (990 ₽)", url="https://t.me/meysternlp")],
+            [InlineKeyboardButton("💳 Получить полный пакет (960 ₽)", url="https://t.me/meysternlp")],
             [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
             [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)],
             [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
