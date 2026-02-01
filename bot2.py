@@ -1,3 +1,5 @@
+# bot2.py
+
 import os
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -22,13 +24,8 @@ if not TOKEN:
     raise ValueError("❌ ОШИБКА: Переменная TELEGRAM_BOT_TOKEN не установлена!")
 
 # ========== СОСТОЯНИЯ ==========
-STAGE_1_BLOCK_1 = 1
-STAGE_1_BLOCK_2 = 2
-STAGE_1_BLOCK_3 = 3
-STAGE_1_BLOCK_4 = 4
-STAGE_1_BLOCK_5 = 5
-STAGE_1_BLOCK_6 = 6
-STAGE_2 = 7
+STAGE_1 = 1
+STAGE_2 = 2
 
 # ========== ЭТАП 1: ВОПРОСЫ ПО БЛОКАМ (24 вопроса) ==========
 STAGE_1_QUESTIONS = {
@@ -494,30 +491,33 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Команда /start"""
     user = update.effective_user
     welcome_text = (
-        f"Привет, {user.first_name}! 👋\n"
-        f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n"
-        f"Этот тест поможет определить твой текущий архетип.\n"
-        f"🎯 Что тебя ждёт:\n"
+        f"Привет, {user.first_name}! 👋\n\n"
+        f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n\n"
+        f"Этот тест поможет определить твой текущий архетип.\n\n"
+        f"🎯 <b>Что тебя ждёт:</b>\n\n"
         f"1️⃣ ЭТАП 1: Определение масти (24 вопроса)\n"
-        f"→ Узнаешь свою базовую программу (♠️ СБ, ♥️ ТФ, ♣️ УБ или ♦️ ЧВ)\n"
+        f"→ Узнаешь свою базовую программу (♠️ СБ, ♥️ ТФ, ♣️ УБ или ♦️ ЧВ)\n\n"
         f"2️⃣ ЭТАП 2: Определение карты (12 вопросов)\n"
-        f"→ Найдём твою текущую карту (6, 7, 8, 9, 10, J, Q, K, A)\n"
+        f"→ Найдём твою текущую карту (6, 7, 8, 9, 10, J, Q, K, A)\n\n"
         f"3️⃣ Персональный архетип\n"
-        f"→ Получишь полное описание + терапевтическую сказку\n"
-        f"⏱ Займёт 10-15 минут\n"
-        f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n"
+        f"→ Получишь полное описание + терапевтическую сказку\n\n"
+        f"⏱ Займёт 10-15 минут\n\n"
+        f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n\n"
         f"✍️ Автор методики: Мейстер А.Ю.\n"
-        f"Психолог, специалист по архетипической психологии\n"
+        f"Психолог, специалист по архетипической психологии\n\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("🚀 Начать тест", callback_data="start_test")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text(welcome_text, reply_markup=reply_markup)
+    await update.message.reply_text(welcome_text, reply_markup=reply_markup, parse_mode="HTML")
 
 async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Начало теста"""
     query = update.callback_query
     await query.answer()
+    
+    # Инициализация данных
+    context.user_data.clear()
     context.user_data["stage_1_answers"] = {"СБ": 0, "ТФ": 0, "УБ": 0, "ЧВ": 0}
     context.user_data["stage_2_answers"] = {"6": 0, "7": 0, "8": 0, "9": 0, "10": 0, "J": 0, "Q": 0, "K": 0, "A": 0}
     context.user_data["current_block"] = "block_1"
@@ -525,42 +525,44 @@ async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     block = STAGE_1_QUESTIONS["block_1"]
     intro_text = (
-        f"{block['title']}\n"
-        f"{block['description']}\n"
+        f"<b>{block['title']}</b>\n\n"
+        f"{block['description']}\n\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data="start_block_1")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(intro_text, reply_markup=reply_markup)
-    return STAGE_1_BLOCK_1
+    await query.edit_message_text(intro_text, reply_markup=reply_markup, parse_mode="HTML")
+    return STAGE_1
 
 async def ask_stage_1_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Задаёт вопрос ЭТАПА 1"""
     query = update.callback_query
     await query.answer()
     
-    current_block = context.user_data["current_block"]
-    current_question = context.user_data["current_question"]
+    current_block = context.user_data.get("current_block", "block_1")
+    current_question = context.user_data.get("current_question", 0)
     block = STAGE_1_QUESTIONS[current_block]
     question = block["questions"][current_question]
     
     block_num = int(current_block.split("_")[1])
-    total_done = (block_num - 1) * 4 + current_question
+    total_done = (block_num - 1) * 4 + current_question + 1
     progress = calculate_progress(total_done, 24)
     
     question_text = (
-        f"{block['title']}\n"
-        f"Вопрос {current_question + 1}/4\n"
-        f"<b>{question['text']}</b>\n"
+        f"<b>{block['title']}</b>\n\n"
+        f"Вопрос {current_question + 1}/4\n\n"
+        f"<b>{question['text']}</b>\n\n"
         f"{progress}"
     )
     
     keyboard = []
     for program, answer in question["options"].items():
-        short_answer = answer[:37] + "..." if len(answer) > 40 else answer
+        short_answer = answer[:50] + "..." if len(answer) > 50 else answer
         keyboard.append([InlineKeyboardButton(short_answer, callback_data=f"stage1_{program}")])
+    
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(question_text, reply_markup=reply_markup, parse_mode="HTML")
+    return STAGE_1
 
 async def handle_stage_1_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработка ответа ЭТАПА 1"""
@@ -577,6 +579,7 @@ async def handle_stage_1_answer(update: Update, context: ContextTypes.DEFAULT_TY
     
     if current_question >= len(block["questions"]):
         return await finish_block(update, context)
+    
     return await ask_stage_1_question(update, context)
 
 async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -594,15 +597,15 @@ async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
     block = STAGE_1_QUESTIONS[next_block]
     
     completion_text = (
-        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n"
-        f"Переходим к следующему блоку:\n"
-        f"{block['title']}\n"
+        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n\n"
+        f"Переходим к следующему блоку:\n\n"
+        f"<b>{block['title']}</b>\n\n"
         f"{block['description']}"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data=f"start_block_{block_num + 1}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="HTML")
-    return STAGE_1_BLOCK_1 + block_num
+    return STAGE_1
 
 async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Завершение ЭТАПА 1"""
@@ -624,19 +627,20 @@ async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
     context.user_data["program"] = program
     
-    results_text = "📊 Твои результаты по программам:\n"
+    results_text = "📊 <b>Твои результаты по программам:</b>\n\n"
     for prog in ["СБ", "ТФ", "УБ", "ЧВ"]:
         results_text += f"{program_names[prog]}: {answers[prog]}/24\n"
     
     result_text = (
-        f"✅ ЭТАП 1 ЗАВЕРШЁН!\n"
-        f"{results_text}"
-        f"🎯 Твоя основная масть:\n"
-        f"<b>{program_names[program]}</b>\n"
-        f"💡 {program_desc[program]}\n"
-        f"🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ\n"
+        f"✅ <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n\n"
+        f"{results_text}\n"
+        f"🎯 <b>Твоя основная масть:</b>\n"
+        f"{program_names[program]}\n\n"
+        f"💡 {program_desc[program]}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ</b>\n\n"
         f"Теперь определим твою карту внутри этой масти.\n"
-        f"Это покажет, на каком этапе пути ты находишься сейчас.\n"
+        f"Это покажет, на каком этапе пути ты находишься сейчас.\n\n"
         f"Готов продолжить?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать ЭТАП 2", callback_data="start_stage_2")]]
@@ -651,9 +655,9 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["current_question"] = 0
     
     intro_text = (
-        f"🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ\n"
-        f"Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.\n"
-        f"📊 Карты (уровни):\n"
+        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КАРТЫ</b>\n\n"
+        f"Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.\n\n"
+        f"📊 <b>Карты (уровни):</b>\n\n"
         f"6 — Жертва\n"
         f"7 — Боец\n"
         f"8 — Манипулятор\n"
@@ -662,13 +666,14 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"J (Валет) — Мастер\n"
         f"Q (Дама) — Учитель\n"
         f"K (Король) — Создатель\n"
-        f"A (Туз) — Свободный\n"
-        f"⚡ Отвечай честно, как есть сейчас.\n"
+        f"A (Туз) — Свободный\n\n"
+        f"⚡ Отвечай честно, как есть сейчас.\n\n"
         f"Готов?"
     )
     keyboard = [[InlineKeyboardButton("✅ Начать", callback_data="start_stage_2_questions")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(intro_text, reply_markup=reply_markup)
+    await query.edit_message_text(intro_text, reply_markup=reply_markup, parse_mode="HTML")
+    return STAGE_2
 
 async def start_stage_2_questions(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Начинает вопросы этапа 2"""
@@ -681,23 +686,26 @@ async def ask_stage_2_question(update: Update, context: ContextTypes.DEFAULT_TYP
     query = update.callback_query
     await query.answer()
     
-    current_question = context.user_data["current_question"]
+    current_question = context.user_data.get("current_question", 0)
     question = STAGE_2_QUESTIONS[current_question]
-    progress = calculate_progress(current_question, 12)
+    progress = calculate_progress(current_question + 1, 12)
     
     question_text = (
-        f"{question['level']}\n"
-        f"<i>{question['description']}</i>\n"
-        f"Вопрос {current_question + 1}/12\n"
-        f"<b>{question['text']}</b>\n"
+        f"<b>{question['level']}</b>\n"
+        f"<i>{question['description']}</i>\n\n"
+        f"Вопрос {current_question + 1}/12\n\n"
+        f"<b>{question['text']}</b>\n\n"
         f"{progress}"
     )
+    
     keyboard = []
     for level, answer in question["options"].items():
-        short_answer = answer[:37] + "..." if len(answer) > 40 else answer
+        short_answer = answer[:50] + "..." if len(answer) > 50 else answer
         keyboard.append([InlineKeyboardButton(short_answer, callback_data=f"stage2_{level}")])
+    
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(question_text, reply_markup=reply_markup, parse_mode="HTML")
+    return STAGE_2
 
 async def handle_stage_2_answer(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обработка ответа ЭТАПА 2"""
@@ -711,13 +719,14 @@ async def handle_stage_2_answer(update: Update, context: ContextTypes.DEFAULT_TY
     
     if current_question >= len(STAGE_2_QUESTIONS):
         return await show_result(update, context)
+    
     return await ask_stage_2_question(update, context)
 
 async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Показ результата"""
     query = update.callback_query
-    program = context.user_data["program"]
-    answers = context.user_data["stage_2_answers"]
+    program = context.user_data.get("program", "СБ")
+    answers = context.user_data.get("stage_2_answers", {})
     level = max(answers, key=answers.get)
     
     archetype_key = f"{program}-{level}"
@@ -725,9 +734,9 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not archetype:
         error_text = (
-            f"⚠️ Произошла ошибка при определении архетипа.\n"
+            f"⚠️ Произошла ошибка при определении архетипа.\n\n"
             f"Пожалуйста, пройдите тест заново или напишите автору:\n"
-            f"👉 @meysternlp\n"
+            f"👉 @meysternlp\n\n"
             f"Мы разберёмся и поможем!"
         )
         keyboard = [
@@ -735,64 +744,89 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
             [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await query.edit_message_text(error_text, reply_markup=reply_markup)
+        await query.edit_message_text(error_text, reply_markup=reply_markup, parse_mode="HTML")
         return ConversationHandler.END
     
-    result_text = (
-        f"🎉 ТЕСТ ЗАВЕРШЁН!\n"
-        f"🎴 Твой архетип:\n"
-        f"{archetype['card']} {archetype['title']}\n"
-        f"📖 КТО ТЫ\n"
-        f"{archetype['who']}\n"
-        f"💭 НАРРАТИВ\n"
-        f"{archetype['narrative']}\n"
-        f"🌑 ТЕНЬ\n"
-        f"{archetype['shadow']}\n"
-        f"🪤 ЛОВУШКА\n"
-        f"{archetype['trap']}\n"
-        f"❓ ЧТО ДЕЛАТЬ\n"
-        f"{archetype['what_to_do']}\n"
-        f"📈 КАК РАСТИ\n"
-        f"{archetype['how_to_grow']}\n"
-        f"⚡ ТРИГГЕР ПЕРЕХОДА\n"
-        f"{archetype['trigger']}\n"
-        f"💰 ДЕНЬГИ\n"
-        f"{archetype['money']}\n"
-        f"📚 ТЕРАПЕВТИЧЕСКАЯ СКАЗКА\n"
-        f"{archetype['fairy_tale']}\n"
-        f"💡 Это пример архетипической сказки.\n"
-        f"Хочешь получить персональную сказку, написанную специально для тебя?\n"
-        f"💎 ПОЛНЫЙ ПАКЕТ (990 ₽)\n"
+    # Разбиваем длинный текст на части
+    result_text_1 = (
+        f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n\n"
+        f"🎴 <b>Твой архетип:</b>\n"
+        f"{archetype.get('card', '')} {archetype.get('title', '')}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"📖 <b>КТО ТЫ</b>\n\n"
+        f"{archetype.get('who', '')}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"💭 <b>НАРРАТИВ</b>\n\n"
+        f"{archetype.get('narrative', '')}"
+    )
+    
+    result_text_2 = (
+        f"🌑 <b>ТЕНЬ</b>\n\n"
+        f"{archetype.get('shadow', '')}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"🪤 <b>ЛОВУШКА</b>\n\n"
+        f"{archetype.get('trap', '')}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"❓ <b>ЧТО ДЕЛАТЬ</b>\n\n"
+        f"{archetype.get('what_to_do', '')}"
+    )
+    
+    result_text_3 = (
+        f"📈 <b>КАК РАСТИ</b>\n\n"
+        f"{archetype.get('how_to_grow', '')}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n\n"
+        f"{archetype.get('trigger', '')}\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"💰 <b>ДЕНЬГИ</b>\n\n"
+        f"{archetype.get('money', '')}"
+    )
+    
+    result_text_4 = (
+        f"📚 <b>ТЕРАПЕВТИЧЕСКАЯ СКАЗКА</b>\n\n"
+        f"{archetype.get('fairy_tale', '')[:500]}...\n\n"
+        f"━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"💡 Это пример архетипической сказки.\n\n"
+        f"Хочешь получить персональную сказку, написанную специально для тебя?\n\n"
+        f"💎 <b>ПОЛНЫЙ ПАКЕТ (990 ₽)</b>\n\n"
         f"✓ Полное описание архетипа (15+ страниц)\n"
         f"✓ Персональная терапевтическая сказка (с твоим именем и ситуацией)\n"
-        f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (epub/pdf)\n"
+        f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (epub/pdf)\n\n"
         f"✍️ Автор методики: Мейстер А.Ю.\n"
-        f"Психолог, специалист по архетипической психологии\n"
+        f"Психолог, специалист по архетипической психологии\n\n"
         f"💬 Хочешь разобраться глубже?\n"
         f"Получить персональную сказку или консультацию:\n"
         f"👉 @meysternlp"
     )
     
-    bot_username = context.bot.username
+    # Отправляем результат частями
+    await query.message.reply_text(result_text_1, parse_mode="HTML")
+    await query.message.reply_text(result_text_2, parse_mode="HTML")
+    await query.message.reply_text(result_text_3, parse_mode="HTML")
+    
+    bot_username = context.bot.username or "VARIATIKA_bot"
     share_url = f"https://t.me/{bot_username}?start=share"
     
     keyboard = [
-        [InlineKeyboardButton("📖 Читать универсальную сказку", url=archetype['link'])],
+        [InlineKeyboardButton("📖 Читать универсальную сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
         [InlineKeyboardButton("💳 Получить полный пакет (990 ₽)", url="https://t.me/meysternlp")],
         [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
         [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)],
         [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(result_text, reply_markup=reply_markup, disable_web_page_preview=True)
+    
+    await query.message.reply_text(result_text_4, reply_markup=reply_markup, parse_mode="HTML", disable_web_page_preview=True)
+    await query.delete_message()
+    
     return ConversationHandler.END
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Отмена теста"""
     cancel_text = (
-        f"❌ Тест отменён.\n"
+        f"❌ Тест отменён.\n\n"
         f"Хочешь начать заново?\n"
-        f"👉 /start\n"
+        f"👉 /start\n\n"
         f"Или есть вопросы? Напиши автору:\n"
         f"👉 @meysternlp"
     )
@@ -802,34 +836,15 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     """Запуск бота"""
     application = Application.builder().token(TOKEN).build()
+    
     conv_handler = ConversationHandler(
         entry_points=[
             CommandHandler("start", start),
             CallbackQueryHandler(start_test, pattern="^start_test$")
         ],
         states={
-            STAGE_1_BLOCK_1: [
-                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_1$"),
-                CallbackQueryHandler(handle_stage_1_answer, pattern="^stage1_")
-            ],
-            STAGE_1_BLOCK_2: [
-                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_2$"),
-                CallbackQueryHandler(handle_stage_1_answer, pattern="^stage1_")
-            ],
-            STAGE_1_BLOCK_3: [
-                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_3$"),
-                CallbackQueryHandler(handle_stage_1_answer, pattern="^stage1_")
-            ],
-            STAGE_1_BLOCK_4: [
-                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_4$"),
-                CallbackQueryHandler(handle_stage_1_answer, pattern="^stage1_")
-            ],
-            STAGE_1_BLOCK_5: [
-                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_5$"),
-                CallbackQueryHandler(handle_stage_1_answer, pattern="^stage1_")
-            ],
-            STAGE_1_BLOCK_6: [
-                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_6$"),
+            STAGE_1: [
+                CallbackQueryHandler(ask_stage_1_question, pattern="^start_block_"),
                 CallbackQueryHandler(handle_stage_1_answer, pattern="^stage1_")
             ],
             STAGE_2: [
@@ -838,11 +853,13 @@ def main():
                 CallbackQueryHandler(handle_stage_2_answer, pattern="^stage2_")
             ]
         },
-        fallbacks=[CommandHandler("cancel", cancel)]
+        fallbacks=[CommandHandler("cancel", cancel)],
+        allow_reentry=True
     )
+    
     application.add_handler(conv_handler)
     logger.info("✅ Бот ВАРИАТИКА запущен!")
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
     main()
