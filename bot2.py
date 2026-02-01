@@ -608,34 +608,28 @@ async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     answers = context.user_data["stage_1_answers"]
     program = max(answers, key=answers.get)
     
-    program_names = {
-        "СБ": "♠️ СИЛОВАЯ ПРОГРАММА",
-        "ТФ": "♥️ ТЕЛЕСНАЯ ПРОГРАММА",
-        "УБ": "♣️ ПОЗНАВАТЕЛЬНАЯ ПРОГРАММА",
-        "ЧВ": "♦️ ЭМОЦИОНАЛЬНАЯ ПРОГРАММА"
+    # ТЕХНИЧЕСКИЕ КООРДИНАТЫ
+    program_coords = {
+        "СБ": "X: Власть/Сила | Y: Контроль/Влияние",
+        "ТФ": "X: Тело/Здоровье | Y: Физические ощущения/Комфорт",
+        "УБ": "X: Знания/Понимание | Y: Логика/Анализ",
+        "ЧВ": "X: Чувства/Отношения | Y: Любовь/Привязанность"
     }
-    program_desc = {
-        "СБ": "Ты ориентируешься на власть, силу и влияние.",
-        "ТФ": "Ты ориентируешься на тело, здоровье и физические ощущения.",
-        "УБ": "Ты ориентируешься на знания, понимание и логику.",
-        "ЧВ": "Ты ориентируешься на чувства, отношения и любовь."
-    }
+    
     context.user_data["program"] = program
     
-    results_text = "📊 <b>Твои результаты:</b>\n"
+    results_text = "📊 <b>Твои результаты (система координат):</b>\n"
     for prog in ["СБ", "ТФ", "УБ", "ЧВ"]:
-        results_text += f"{program_names[prog]}: {answers[prog]}/24\n"
+        results_text += f"{program_coords[prog]}: {answers[prog]}/24\n"
     
     result_text = (
-        f"✅ <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n"
-        f"{results_text}"
+        f"✅ <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n\n"
+        f"{results_text}\n"
         f"🎯 <b>Твоя основная конфигурация восприятия:</b>\n"
-        f"{program_names[program]}\n"
-        f"💡 {program_desc[program]}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"{program_coords[program]}\n\n"
         f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n"
-        f"Теперь определим твою карту внутри этой масти.\n"
-        f"Это покажет, на каком этапе пути ты находишься сейчас.\n"
+        f"Теперь определим логику мышления в этой системе восприятия.\n"
+        f"Это покажет твои убеждения, ценности и паттерны поведения.\n"
         f"Готов продолжить?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать ЭТАП 2", callback_data="start_stage_2")]]
@@ -651,17 +645,17 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     intro_text = (
         f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n"
-        f"Сейчас я задам тебе 12 вопросов, чтобы определить твою карту.\n"
-        f"📊 <b>Карты (уровни):</b>\n"
-        f"6 — Жертва\n"
-        f"7 — Боец\n"
-        f"8 — Манипулятор\n"
-        f"9 — Исполнитель\n"
-        f"10 — Лидер\n"
-        f"J (Валет) — Мастер\n"
-        f"Q (Дама) — Учитель\n"
-        f"K (Король) — Создатель\n"
-        f"A (Туз) — Свободный\n"
+        f"Сейчас я задам тебе 12 вопросов, чтобы определить твой тип мышления.\n\n"
+        f"📊 <b>Уровни:</b>\n"
+        f"Жертва\n"
+        f"Боец\n"
+        f"Манипулятор\n"
+        f"Исполнитель\n"
+        f"Лидер\n"
+        f"Мастер\n"
+        f"Учитель\n"
+        f"Создатель\n"
+        f"Свободный\n\n"
         f"⚡ Отвечай честно, как есть сейчас.\n"
         f"Готов?"
     )
@@ -729,46 +723,41 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not archetype:
         error_text = (
             f"⚠️ Произошла ошибка при определении архетипа.\n"
-            f"Пожалуйста, пройдите тест заново или напишите автору:\n"
-            f"👉 @meysternlp"
+            f"Пожалуйста, пройдите тест заново:\n"
+            f"👉 /start"
         )
-        keyboard = [
-            [InlineKeyboardButton("🔄 Пройти заново", callback_data="start_test")],
-            [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")]
-        ]
+        keyboard = [[InlineKeyboardButton("🔄 Пройти заново", callback_data="start_test")]]
         reply_markup = InlineKeyboardMarkup(keyboard)
         await query.edit_message_text(error_text, reply_markup=reply_markup, parse_mode="HTML")
         return ConversationHandler.END
     
-    # КОМПАКТНЫЙ РЕЗУЛЬТАТ
+    # КОМПАКТНЫЙ РЕЗУЛЬТАТ БЕЗ РАЗДЕЛИТЕЛЕЙ
     result_text = (
-        f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n"
-        f"🎴 <b>Твой архетип:</b>\n{archetype.get('card', '')} {archetype.get('title', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"📖 <b>КТО ТЫ</b>\n{archetype.get('who', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"💭 <b>НАРРАТИВ</b>\n{archetype.get('narrative', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🌑 <b>ТЕНЬ</b>\n{archetype.get('shadow', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"🪤 <b>ЛОВУШКА</b>\n{archetype.get('trap', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"❓ <b>ЧТО ДЕЛАТЬ</b>\n{archetype.get('what_to_do', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"📈 <b>КАК РАСТИ</b>\n{archetype.get('how_to_grow', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n{archetype.get('trigger', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
-        f"💰 <b>ДЕНЬГИ</b>\n{archetype.get('money', '')}\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n\n"
+        f"🎴 <b>Твой архетип:</b>\n"
+        f"{archetype.get('card', '')} {archetype.get('title', '')}\n\n"
+        f"📖 <b>КТО ТЫ</b>\n"
+        f"{archetype.get('who', '')}\n\n"
+        f"💭 <b>НАРРАТИВ</b>\n"
+        f"{archetype.get('narrative', '')}\n\n"
+        f"🌑 <b>ТЕНЬ</b>\n"
+        f"{archetype.get('shadow', '')}\n\n"
+        f"🪤 <b>ЛОВУШКА</b>\n"
+        f"{archetype.get('trap', '')}\n\n"
+        f"❓ <b>ЧТО ДЕЛАТЬ</b>\n"
+        f"{archetype.get('what_to_do', '')}\n\n"
+        f"📈 <b>КАК РАСТИ</b>\n"
+        f"{archetype.get('how_to_grow', '')}\n\n"
+        f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n"
+        f"{archetype.get('trigger', '')}\n\n"
+        f"💰 <b>ДЕНЬГИ</b>\n"
+        f"{archetype.get('money', '')}\n\n"
         f"📚 <b>РАБОЧИЙ ИНСТРУМЕНТ КОРРЕКЦИИ</b>\n"
-        f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n\n"
         f"💎 <b>ПОЛНЫЙ ПАКЕТ (960 ₽)</b>\n"
         f"✓ Полное описание архетипа и персональные рекомендации (15+ страниц)\n"
         f"✓ Персональная терапевтическая сказка для коррекции других конфликтующих частей\n"
-        f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n"
-        f"━━━━━━━━━━━━━━━━━━━━\n"
+        f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n\n"
         f"💬 Хочешь разобраться глубже?\n"
         f"Получить персональную консультацию:\n"
         f"👉 @meysternlp"
@@ -777,35 +766,34 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Если текст слишком длинный, разбиваем на 2 части
     if len(result_text) > 4096:
         part1 = (
-            f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n"
-            f"🎴 <b>Твой архетип:</b>\n{archetype.get('card', '')} {archetype.get('title', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"📖 <b>КТО ТЫ</b>\n{archetype.get('who', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"💭 <b>НАРРАТИВ</b>\n{archetype.get('narrative', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"🌑 <b>ТЕНЬ</b>\n{archetype.get('shadow', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"🪤 <b>ЛОВУШКА</b>\n{archetype.get('trap', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"❓ <b>ЧТО ДЕЛАТЬ</b>\n{archetype.get('what_to_do', '')}"
+            f"🎉 <b>ТЕСТ ЗАВЕРШЁН!</b>\n\n"
+            f"🎴 <b>Твой архетип:</b>\n"
+            f"{archetype.get('card', '')} {archetype.get('title', '')}\n\n"
+            f"📖 <b>КТО ТЫ</b>\n"
+            f"{archetype.get('who', '')}\n\n"
+            f"💭 <b>НАРРАТИВ</b>\n"
+            f"{archetype.get('narrative', '')}\n\n"
+            f"🌑 <b>ТЕНЬ</b>\n"
+            f"{archetype.get('shadow', '')}\n\n"
+            f"🪤 <b>ЛОВУШКА</b>\n"
+            f"{archetype.get('trap', '')}\n\n"
+            f"❓ <b>ЧТО ДЕЛАТЬ</b>\n"
+            f"{archetype.get('what_to_do', '')}"
         )
         
         part2 = (
-            f"📈 <b>КАК РАСТИ</b>\n{archetype.get('how_to_grow', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n{archetype.get('trigger', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
-            f"💰 <b>ДЕНЬГИ</b>\n{archetype.get('money', '')}\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"📈 <b>КАК РАСТИ</b>\n"
+            f"{archetype.get('how_to_grow', '')}\n\n"
+            f"⚡ <b>ТРИГГЕР ПЕРЕХОДА</b>\n"
+            f"{archetype.get('trigger', '')}\n\n"
+            f"💰 <b>ДЕНЬГИ</b>\n"
+            f"{archetype.get('money', '')}\n\n"
             f"📚 <b>РАБОЧИЙ ИНСТРУМЕНТ КОРРЕКЦИИ</b>\n"
-            f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"💡 Твой инструмент который корректирует конфигурацию поведения, на уровне конфигурации мышления – это метафорическая форма.\n\n"
             f"💎 <b>ПОЛНЫЙ ПАКЕТ (960 ₽)</b>\n"
             f"✓ Полное описание архетипа и персональные рекомендации (15+ страниц)\n"
             f"✓ Персональная терапевтическая сказка для коррекции других конфликтующих частей\n"
-            f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n"
-            f"━━━━━━━━━━━━━━━━━━━━\n"
+            f"✓ Книга «ВАРИАТИКА. Библиотека человеческих паттернов» (pdf) для самостоятельной коррекции на уровне конфигурации восприятия\n\n"
             f"💬 Хочешь разобраться глубже?\n"
             f"Получить персональную консультацию:\n"
             f"👉 @meysternlp"
@@ -817,10 +805,9 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         share_url = f"https://t.me/{bot_username}?start=share"
         
         keyboard = [
+            [InlineKeyboardButton("📖 Читать сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
             [InlineKeyboardButton("💳 Получить полный пакет (960 ₽)", url="https://t.me/meysternlp")],
-            [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
-            [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)],
-            [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
+            [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -830,10 +817,9 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         share_url = f"https://t.me/{bot_username}?start=share"
         
         keyboard = [
+            [InlineKeyboardButton("📖 Читать сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
             [InlineKeyboardButton("💳 Получить полный пакет (960 ₽)", url="https://t.me/meysternlp")],
-            [InlineKeyboardButton("💬 Написать автору", url="https://t.me/meysternlp")],
-            [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)],
-            [InlineKeyboardButton("🔄 Пройти тест заново", callback_data="start_test")]
+            [InlineKeyboardButton("📤 Поделиться тестом", url=share_url)]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -847,9 +833,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     cancel_text = (
         f"❌ Тест отменён.\n"
         f"Хочешь начать заново?\n"
-        f"👉 /start\n"
-        f"Или есть вопросы? Напиши автору:\n"
-        f"👉 @meysternlp"
+        f"👉 /start"
     )
     await update.message.reply_text(cancel_text)
     return ConversationHandler.END
