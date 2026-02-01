@@ -27,6 +27,50 @@ if not TOKEN:
 STAGE_1 = 1
 STAGE_2 = 2
 
+# ========== ЧЕЛОВЕЧЕСКИЕ ОПИСАНИЯ ДЛЯ ПРОМЕЖУТОЧНОГО РЕЗУЛЬТАТА ==========
+PROGRAM_DESCRIPTIONS = {
+    "СБ": {
+        "title": "⚔️ ПРОГРАММА СИЛЫ И КОНТРОЛЯ",
+        "description": (
+            "Ты живёшь в мире, где важно быть сильным. "
+            "Чувствуешь давление обстоятельств и людей. "
+            "Твоя задача — удержать контроль, не дать себя сломать. "
+            "Иногда ты борешься, иногда терпишь. "
+            "Но главное — не показать слабость."
+        )
+    },
+    "ТФ": {
+        "title": "🌿 ПРОГРАММА ТЕЛА И КОМФОРТА",
+        "description": (
+            "Твоё тело — твой главный советник. "
+            "Ты чувствуешь усталость, напряжение, дискомфорт. "
+            "Тебе важно, чтобы было хорошо физически. "
+            "Ты заботишься о здоровье — своём или чужом. "
+            "Когда телу плохо — всё плохо."
+        )
+    },
+    "УБ": {
+        "title": "🧠 ПРОГРАММА ЗНАНИЙ И ПОНИМАНИЯ",
+        "description": (
+            "Ты живёшь в голове. "
+            "Тебе важно понять, как всё устроено. "
+            "Ты анализируешь, ищешь логику, собираешь информацию. "
+            "Непонимание вызывает тревогу. "
+            "Знание — твоя опора в мире."
+        )
+    },
+    "ЧВ": {
+        "title": "❤️ ПРОГРАММА ЧУВСТВ И ОТНОШЕНИЙ",
+        "description": (
+            "Ты живёшь сердцем. "
+            "Тебе важно быть любимым, нужным, принятым. "
+            "Отношения — твоя главная ценность. "
+            "Ты боишься одиночества и отвержения. "
+            "Когда рядом тепло — ты жив."
+        )
+    }
+}
+
 # ========== ЭТАП 1: ВОПРОСЫ ПО БЛОКАМ (24 вопроса) ==========
 STAGE_1_QUESTIONS = {
     "block_1": {
@@ -491,17 +535,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Команда /start"""
     user = update.effective_user
     welcome_text = (
-        f"Привет, {user.first_name}! 👋\n"
-        f"🎴 Добро пожаловать в диагностику архетипов ВАРИАТИКА!\n"
-        f"Этот тест поможет определить твой текущий архетип.\n"
-        f"🎯 <b>Что тебя ждёт:</b>\n"
+        f"Привет, {user.first_name}! 👋\n\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  🎴 ДИАГНОСТИКА АРХЕТИПОВ      ┃\n"
+        f"┃     ВАРИАТИКА                  ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+        f"Этот тест поможет определить твой текущий архетип.\n\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  🎯 ЧТО ТЕБЯ ЖДЁТ:             ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
         f"1️⃣ ЭТАП 1: Определение конфигурации восприятия (24 вопроса)\n"
-        f"→ Узнаешь свою базовую программу\n"
+        f"   → Узнаешь свою базовую программу\n\n"
         f"2️⃣ ЭТАП 2: Определение конфигурации мышления (12 вопросов)\n"
-        f"→ Найдём твою текущую программу\n"
-        f"→ Определим поведенческие паттерны и методы их коррекции\n"
-        f"⏱ Займёт 10-15 минут\n"
-        f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n"
+        f"   → Найдём твою текущую программу\n"
+        f"   → Определим поведенческие паттерны и методы их коррекции\n\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  ⏱ ВРЕМЯ: 10-15 МИНУТ          ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+        f"📌 Отвечай честно, как есть сейчас, а не как хотелось бы.\n\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("🚀 Начать тест", callback_data="start_test")]]
@@ -521,8 +572,10 @@ async def start_test(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     block = STAGE_1_QUESTIONS["block_1"]
     intro_text = (
-        f"<b>{block['title']}</b>\n"
-        f"{block['description']}\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  {block['title']}  ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+        f"{block['description']}\n\n"
         f"Готов начать?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data="start_block_1")]]
@@ -545,8 +598,10 @@ async def ask_stage_1_question(update: Update, context: ContextTypes.DEFAULT_TYP
     progress = calculate_progress(total_done, 24)
     
     question_text = (
-        f"<b>{block['title']}</b>\n"
-        f"<b>{question['text']}</b>\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  {block['title']}  ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+        f"<b>{question['text']}</b>\n\n"
         f"{progress}"
     )
     
@@ -592,9 +647,11 @@ async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
     block = STAGE_1_QUESTIONS[next_block]
     
     completion_text = (
-        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n"
-        f"Переходим к следующему блоку:\n"
-        f"<b>{block['title']}</b>\n"
+        f"✅ <b>БЛОК {block_num} ЗАВЕРШЁН!</b>\n\n"
+        f"Переходим к следующему блоку:\n\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  {block['title']}  ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
         f"{block['description']}"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать блок", callback_data=f"start_block_{block_num + 1}")]]
@@ -603,10 +660,12 @@ async def finish_block(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return STAGE_1
 
 async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Завершение ЭТАПА 1"""
+    """Завершение ЭТАПА 1 с человеческим описанием"""
     query = update.callback_query
     answers = context.user_data["stage_1_answers"]
     program = max(answers, key=answers.get)
+    
+    program_info = PROGRAM_DESCRIPTIONS[program]
     
     # ТЕХНИЧЕСКИЕ КООРДИНАТЫ
     program_coords = {
@@ -618,18 +677,25 @@ async def finish_stage_1(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     context.user_data["program"] = program
     
-    results_text = "📊 <b>Твои результаты (система координат):</b>\n"
+    results_text = "📊 <b>Твои результаты (система координат):</b>\n\n"
     for prog in ["СБ", "ТФ", "УБ", "ЧВ"]:
         results_text += f"{program_coords[prog]}: {answers[prog]}/24\n"
     
     result_text = (
         f"✅ <b>ЭТАП 1 ЗАВЕРШЁН!</b>\n\n"
-        f"{results_text}\n"
+        f"{results_text}\n\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  {program_info['title']}  ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+        f"{program_info['description']}\n\n"
         f"🎯 <b>Твоя основная конфигурация восприятия:</b>\n"
         f"{program_coords[program]}\n\n"
-        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ        ┃\n"
+        f"┃  КОНФИГУРАЦИИ МЫШЛЕНИЯ         ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
         f"Теперь определим логику мышления в этой системе восприятия.\n"
-        f"Это покажет твои убеждения, ценности и паттерны поведения.\n"
+        f"Это покажет твои убеждения, ценности и паттерны поведения.\n\n"
         f"Готов продолжить?"
     )
     keyboard = [[InlineKeyboardButton("▶️ Начать ЭТАП 2", callback_data="start_stage_2")]]
@@ -644,7 +710,10 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["current_question"] = 0
     
     intro_text = (
-        f"🎯 <b>ЭТАП 2: ОПРЕДЕЛЕНИЕ КОНФИГУРАЦИИ МЫШЛЕНИЯ</b>\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  🎯 ЭТАП 2: ОПРЕДЕЛЕНИЕ        ┃\n"
+        f"┃  КОНФИГУРАЦИИ МЫШЛЕНИЯ         ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
         f"Сейчас я задам тебе 12 вопросов, чтобы определить твой тип мышления.\n\n"
         f"📊 <b>Уровни:</b>\n"
         f"Жертва\n"
@@ -656,7 +725,7 @@ async def start_stage_2(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Учитель\n"
         f"Создатель\n"
         f"Свободный\n\n"
-        f"⚡ Отвечай честно, как есть сейчас.\n"
+        f"⚡ Отвечай честно, как есть сейчас.\n\n"
         f"Готов?"
     )
     keyboard = [[InlineKeyboardButton("✅ Начать", callback_data="start_stage_2_questions")]]
@@ -680,9 +749,11 @@ async def ask_stage_2_question(update: Update, context: ContextTypes.DEFAULT_TYP
     progress = calculate_progress(current_question + 1, 12)
     
     question_text = (
-        f"<b>{question['level']}</b>\n"
-        f"<i>{question['description']}</i>\n"
-        f"<b>{question['text']}</b>\n"
+        f"┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n"
+        f"┃  {question['level']}  ┃\n"
+        f"┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n"
+        f"<i>{question['description']}</i>\n\n"
+        f"<b>{question['text']}</b>\n\n"
         f"{progress}"
     )
     
@@ -801,8 +872,8 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         await query.message.reply_text(part1, parse_mode="HTML")
         
-        bot_username = context.bot.username or "VARIATIKA_bot"
-        share_url = f"https://t.me/{bot_username}?start=share"
+        # ИСПРАВЛЕННАЯ ССЫЛКА НА БОТА
+        share_url = "https://t.me/VARIATUCA_bot?start=share"
         
         keyboard = [
             [InlineKeyboardButton("📖 Читать сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
@@ -813,8 +884,8 @@ async def show_result(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         await query.message.reply_text(part2, reply_markup=reply_markup, parse_mode="HTML", disable_web_page_preview=True)
     else:
-        bot_username = context.bot.username or "VARIATIKA_bot"
-        share_url = f"https://t.me/{bot_username}?start=share"
+        # ИСПРАВЛЕННАЯ ССЫЛКА НА БОТА
+        share_url = "https://t.me/VARIATUCA_bot?start=share"
         
         keyboard = [
             [InlineKeyboardButton("📖 Читать сказку", url=archetype.get('link', 'https://t.me/meysternlp'))],
